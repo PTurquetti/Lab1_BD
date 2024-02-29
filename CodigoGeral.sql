@@ -1,3 +1,9 @@
+-- LABORATORIO 1
+
+-- Amanda Valukas Breviglieri Joioso - 4818232
+-- Paulo Henrique Vedovatto Turquetti - 13750791
+
+
 --Criacao da tabela Federacao
 CREATE TABLE FEDERACAO (
     NOME_FD VARCHAR2(50) NOT NULL,
