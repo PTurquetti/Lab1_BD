@@ -29,7 +29,7 @@ CREATE TABLE LIDER (
 );
 
 
-----Criacao da tabela Faccao
+--Criacao da tabela Faccao
 CREATE TABLE FACCAO (
     NOME_FC VARCHAR2(50) NOT NULL,
     LIDER_FC NUMBER NOT NULL,
