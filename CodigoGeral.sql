@@ -9,10 +9,13 @@ CREATE TABLE FEDERACAO (
 --Criacao da tabela Nacao
 CREATE TABLE NACAO(
     NOME_NC VARCHAR(50) NOT NULL,
-    QTD_PLANETAS NUMBER DEFAULT 0,
+    QTD_PLANETAS NUMBER,
     FEDERACAO VARCHAR(50),
     CONSTRAINT PK_NACAO PRIMARY KEY (NOME_NC),
-    CONSTRAINT FK_NACAO FOREIGN KEY (FEDERACAO) REFERENCES FEDERACAO (NOME_FD) ON DELETE SET NULL
+    /* Como na descricao nao ha nenhuma afirmacao de que uma nacao nao pode existir sem uma federacao,
+    ela nao deve ser excluida se uma federacao for, então apenas marcamos o campo de federacao como null nesse caso,
+    por isso o uso do ON DELETE SET NULL*/
+    CONSTRAINT FK_NACAO FOREIGN KEY (FEDERACAO) REFERENCES FEDERACAO (NOME_FD) ON DELETE SET NULL 
 );
 
 
@@ -24,7 +27,10 @@ CREATE TABLE LIDER (
     NACAO VARCHAR2(50) NOT NULL,
     ESPECIE VARCHAR2(50) NOT NULL,
     CONSTRAINT PK_LIDER PRIMARY KEY (CPI),
+    /* Caso uma nacao deixe de exixstir, o registro de lider tambem deve ser apagado, pois ele nao pode ser o lider sem
+    uma ncao para liderar, por isso o uso do ON DELETE CASCADE*/
     CONSTRAINT FK_LIDER FOREIGN KEY (NACAO) REFERENCES FEDERACAO (NOME_FD) ON DELETE CASCADE,
+    -- CHECK para conferir se o cargo do lider se encaixa em uma das categorias validas
     CONSTRAINT CK_CARGOLIDER CHECK (UPPER(CARGO) IN ('COMANDANTE', 'OFICIAL', 'CIENTISTA'))
 );
 
@@ -37,7 +43,11 @@ CREATE TABLE FACCAO (
     QTD_NACOES NUMBER,
     CONSTRAINT PK_FACCAO PRIMARY KEY (NOME_FC),
     CONSTRAINT UK_FACCAO UNIQUE (LIDER_FC),
+    /* Nessa FOREIGN KEY nao foi colocado nenhum ON DELETE, pois nao faz sentido logicamente deletar toda 
+    uma faccao ao se deletar apenas um lider e, como LIDER_FC  eh NOT NULL de acordo com o modelo, nao podemos
+    fazer o ON DELETE SET NULL, entao o ideal seria fazer um update antes de se deletar o lider*/
     CONSTRAINT FK_FACCAO FOREIGN KEY (LIDER_FC) REFERENCES LIDER (CPI),
+    -- CHECK para conferir se a ideologia se encaixa em uma das categorias validas
     CONSTRAINT CK_IDEOLOGIAFACCAO CHECK (UPPER(IDEOLOGIA) IN ('PROGRESSISTA', 'TOTALITARIA', 'TRADICIONALISTA'))
 );
 
@@ -47,9 +57,11 @@ CREATE TABLE NACAOFACCAO (
     NACAO VARCHAR2(50) NOT NULL,
     FACCAO VARCHAR2(50) NOT NULL,
     CONSTRAINT PK_NACAOFACCAO PRIMARY KEY (NACAO, FACCAO),
-    CONSTRAINT FK_NACAOFACCAO FOREIGN KEY (FACCAO) REFERENCES FACCAO (NOME_FC) ON DELETE CASCADE
+    /* Como essa tabela mapeia o relacionamento de uma nacao e uma faccao, se uma faccao deixa de existir,
+    essa relacao tambem deixa e vice-versa, por isso o uso do ON DELETE CASCADE*/
+    CONSTRAINT FK_NACAOFACCAO1 FOREIGN KEY (FACCAO) REFERENCES FACCAO (NOME_FC) ON DELETE CASCADE,
+    CONSTRAINT FK_NACAOFACCAO2 FOREIGN KEY (NACAO) REFERENCES NACAO (NOME_NC) ON DELETE CASCADE
 );
-
 
 --Criacao da tabela Estrela
 CREATE TABLE ESTRELA (
@@ -135,9 +147,12 @@ CREATE TABLE ESPECIE (
     EH_INTELIGENTE CHAR(1) NOT NULL,
     
     CONSTRAINT PK_ESPECIE PRIMARY KEY (NOME_CIENTIFICO),
+    /* Como toda especie tem um planeta de origem e esse atributo eh NOT NULL, se um planeta deixar de
+    existir, essa especie tambem deixara, por isso o uso do ON DELETE CASCADE*/
     CONSTRAINT FK_ESPECIE FOREIGN KEY (PLANETA_ORIGEM)
                         REFERENCES PLANETA (DESIGNACAO_ASTRONOMICA)
                         ON DELETE CASCADE,
+    -- Checa se a especie eh inteligente ou nao
     CONSTRAINT CK_ESPECIE CHECK (UPPER(EH_INTELIGENTE) IN ('S', 'N'))
 );
 
@@ -149,8 +164,10 @@ CREATE TABLE DOMINANCIA (
     DATA_INI DATE NOT NULL,
     DATA_FIM DATE,
     CONSTRAINT PK_DOMINANCIA PRIMARY KEY (NACAO, PLANETA, DATA_INI),
-    CONSTRAINT FK_DOMINANCIA1 FOREIGN KEY (NACAO) REFERENCES NACAO (NOME_NC),
-    CONSTRAINT FK_DOMINANCIA2 FOREIGN KEY (PLANETA) REFERENCES PLANETA (DESIGNACAO_ASTRONOMICA)
+    /* Como essa tabela mapeia o relacionamento de um planeta e uma nacao, se um planeta deixa de existir,
+    essa relacao tambem deixa e vice-versa, por isso o uso do ON DELETE CASCADE*/
+    CONSTRAINT FK_DOMINANCIA1 FOREIGN KEY (NACAO) REFERENCES NACAO (NOME_NC) ON DELETE CASCADE,
+    CONSTRAINT FK_DOMINANCIA2 FOREIGN KEY (PLANETA) REFERENCES PLANETA (DESIGNACAO_ASTRONOMICA) ON DELETE CASCADE
 );
 
 
@@ -160,9 +177,9 @@ CREATE TABLE COMUNIDADE (
     NOME VARCHAR2(50) NOT NULL,
     QTD_HABITANTES NUMBER, 
     CONSTRAINT PK_COMUNIDADE PRIMARY KEY (ESPECIE, NOME),
-    CONSTRAINT FK_COMUNIDADE FOREIGN KEY (ESPECIE) 
-                        REFERENCES ESPECIE (NOME_CIENTIFICO) 
-                        ON DELETE CASCADE
+    /* Se uma especie deixa e existir, a comunidade que era composta por essa especia tambem deixa,
+    por isso o uso do ON DELETE CASCADE*/
+    CONSTRAINT FK_COMUNIDADE FOREIGN KEY (ESPECIE) REFERENCES ESPECIE (NOME_CIENTIFICO) ON DELETE CASCADE
 );
 
 
