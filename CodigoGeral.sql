@@ -63,8 +63,10 @@ CREATE TABLE ESTRELA (
     
     CONSTRAINT PK_ESTRELA PRIMARY KEY (ID_CATALOGO),
     CONSTRAINT SK_ESTRELA UNIQUE (COORDENADA_X, COORDENADA_y, COORDENADA_Z)
+    /*Essa abordagem de ESTRELA não garante a obrigatoriedade compor um sistema ou orbitar direta/indiretamente uma estrela que compõe um sistema.
+    Sendo assim, isso deve ser garantido em nível de aplicação*/
 );    
--- Essa abordagem de ESTRELA não garante a obrigatoriedade compor um sistema ou orbitar direta/indiretamente uma estrela que compõe um sistema
+
 
 
 --Criacao da tabela Sistema
