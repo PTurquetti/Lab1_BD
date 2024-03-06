@@ -21,7 +21,7 @@ CREATE TABLE NACAO(
     /* Como na descricao nao ha nenhuma afirmacao de que uma nacao nao pode existir sem uma federacao,
     ela nao deve ser excluida se uma federacao for, então apenas marcamos o campo de federacao como null nesse caso,
     por isso o uso do ON DELETE SET NULL*/
-    CONSTRAINT FK_NACAO FOREIGN KEY (FEDERACAO) REFERENCES FEDERACAO (NOME_FD) ON DELETE SET NULL 
+    CONSTRAINT FK_NACAO FOREIGN KEY (FEDERACAO) REFERENCES NACAO (NOME_NC) ON DELETE SET NULL 
 );
 
 
