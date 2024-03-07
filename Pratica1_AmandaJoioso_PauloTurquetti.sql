@@ -35,7 +35,7 @@ CREATE TABLE LIDER (
     CONSTRAINT PK_LIDER PRIMARY KEY (CPI),
     /* Caso uma nacao deixe de exixstir, o registro de lider tambem deve ser apagado, pois ele nao pode ser o lider sem
     uma ncao para liderar, por isso o uso do ON DELETE CASCADE*/
-    CONSTRAINT FK_LIDER FOREIGN KEY (NACAO) REFERENCES FEDERACAO (NOME_FD) ON DELETE CASCADE,
+    CONSTRAINT FK_LIDER FOREIGN KEY (NACAO) REFERENCES NACAO(NOME_NC) ON DELETE CASCADE,
     -- CHECK para conferir se o cargo do lider se encaixa em uma das categorias validas
     CONSTRAINT CK_CARGOLIDER CHECK (UPPER(CARGO) IN ('COMANDANTE', 'OFICIAL', 'CIENTISTA'))
 );
