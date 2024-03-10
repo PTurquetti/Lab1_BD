@@ -79,9 +79,9 @@ SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE
 FROM ALL_CONSTRAINTS
 WHERE TABLE_NAME IN ('NACAO');
 
--- Visualizar dados na tabela NACAO e FEDERACAO
+-- Visualizar dados na tabela NACAO
 SELECT * FROM NACAO;
 
 /* Após a remocao da FK de NACAO e, posteriormente da tabela FEDERACAO, os dados ja
-inseridos no atributo FEDERACAO de nacao continuam la*/
+inseridos no atributo FEDERACAO de nacao continuam la, nao afetando os dados anteriores*/
 
