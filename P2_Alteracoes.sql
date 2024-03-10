@@ -19,8 +19,7 @@ DROP CONSTRAINT CK_CARGOLIDER;
 -- 4.d)
 /* Criando um novo CHECK exatamente para o atributo de cargo que acabamos de dropar, mas agora
 testando para novos cargos, a primeira tentativa foi fazer da seguinte forma:*/
-ALTER TABLE LIDER
-ADD CONSTRAINT CK_CARGO CHECK (UPPER(CARGO) IN ('EXPLORADOR', 'DIPLOMATA', 'ENGENHEIRO'));
+-- [VERSAO QUE DA ERRO] ALTER TABLE LIDER ADD CONSTRAINT CK_CARGO CHECK (UPPER(CARGO) IN ('EXPLORADOR', 'DIPLOMATA', 'ENGENHEIRO'));
 /* Entretanto, como ja existem dados nas tuplas para cargo e eles nao se adequam aos dados novos, ocorreu um erro
 que nao deixou com que nos mudassemos o CHECK assim. Para contornar a situacao, procuramos o uso do NOVALIDATE. 
 Então, agora o script inclui a opção NOVALIDATE ao criar a restrição CK_CARGO, que implica que os dados existentes 
@@ -31,7 +30,7 @@ ADD CONSTRAINT CK_CARGO CHECK (UPPER(CARGO) IN ('EXPLORADOR', 'DIPLOMATA', 'ENGE
 continuam inalterados. Dessa forma, uma insercao que daria erro e umaa que rodaria normalmente sao, respectivamente:*/
 -- !ERRO! 
 -- Tentativa de insercao de dado que nao atende a nova restricao
-INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES (4, 'Darth Vader', 'COMANDANTE', 'Martianos Unidos', 'Humano');
+-- [VERSAO QUE DA ERRO] INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES (4, 'Darth Vader', 'COMANDANTE', 'Martianos Unidos', 'Humano');
 -- Tentativa de inserção de dado que atende à nova restrição
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES (5, 'Luke Skywalker', 'EXPLORADOR', 'Terra Unida', 'Humano');
 
