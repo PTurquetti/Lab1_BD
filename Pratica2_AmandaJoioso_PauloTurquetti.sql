@@ -7,7 +7,7 @@
 
 /* OBS: Foram feitas algumas correcoes em relacao a contraints de foreign keys.
 Segue abaixo o script de criação das tabelas (todas as estruturas foram mantidas
-da pratica 1 */
+da pratica 1) */
 
 --Criacao da tabela Federacao
 CREATE TABLE FEDERACAO (
@@ -395,7 +395,7 @@ continuam inalterados. Dessa forma, uma insercao que daria erro e umaa que rodar
 -- Tentativa de inserção de dado que atende à nova restrição
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES (5, 'Luke Skywalker', 'EXPLORADOR', 'Terra Unida', 'Humano');
 
--- 4.e)
+-- e)
 -- i.
 /* Aqui foi alterada a tabela FEDERACAO para que o DEFAULT da DATA_FUND fosse SYSDATE, que eh a data atual no sistema*/ 
 ALTER TABLE FEDERACAO
@@ -408,11 +408,52 @@ MODIFY EH_INTELIGENTE CHAR;
 
 
 -- f)
--- i
+-- i. Analisando tabela Estrela:
+
+/* A tabela Estrela é composta por 7 atributos (ID_CATALOGO, NOME, CLASSIFICACAO,
+MASSA, COORDENADA_X, COORDENADA_Y e COORDENADA_Z), sendo que sua chave primária é
+definida por ID_CATALOGO. Alem da constraint de primary key, temos NOT NULL para
+os atributos ID_CATALOGO, COORDENADA_X, COORDENADA_Y e COORDENADA_Z. Essa tabela
+possui chave secundaria, composta pela combinacao de COORDENADA_X, COORDENADA_Y e
+COORDENADA_Z.
+
+Foram inseridas as seguintes tuplas na tabela Estrela:
+
+ID_CATALOGO   NOME                 CLASSIFICACAO   MASSA                            COORDENADA_X  COORDENADA_Y  COORDENADA_Z
+123456	      Sol	               Classe G	       1989000000000000000000000000000	  1	            2	            3
+654321	      Alpha Centauri A	   Classe M		   (null)                             4	            5	            6
+
+*/
+
+
+-- ii. Removendo atributos que definem a chave primaria de Estrela
+
+ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO;
+/* Ao tentar excluir a coluna referente a chave primaria de Estrela ID_CATALOGO,
+utilizando o comando ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO, a operacao foi
+impedida devido a existencia de constraints que referenciam esse atributo */
+
+ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO CASCADE CONSTRAINTS;
+/* Sendo assim, utilizamos o comando ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO CASCADE CONSTRAINTS.
+com ele, a tabela Estrela agora nao possui nenhuma chave primaria, ja que A constraint de PRIMARY KEY
+de Estrela  deixou de existir. 
+
+Nos dados inseridos em Estrela, agora temos:
+
+NOME                 CLASSIFICACAO   MASSA                            COORDENADA_X  COORDENADA_Y  COORDENADA_Z
+Sol	                 Classe G	     1989000000000000000000000000000	1	            2           	3
+Alpha Centauri A	 Classe M		 (null)                             4	            5           	6
+
+
+Em relacao as tabelas que referenciam Estrela (Sistema, OrbitaEstrela e OrbitaPlaneta),
+os valores que referenciavam a PK de estrela foram mantidos. No entanto, todas as constraints
+de FOREIGN KEY referentes a Estrela nessas tabelas foram removidas
+
+*/
 
 
 -- g)
--- i
+-- i.
 /* Vamos remover a tabela FEDERACAO do sistema. Esta tabela é referenciada pela tabela NACAO. 
 Analisando a estrutura e dados da tabela FEDERACAO:*/
 -- Visualizar a estrutura da tabela FEDERACAO e NACAO
