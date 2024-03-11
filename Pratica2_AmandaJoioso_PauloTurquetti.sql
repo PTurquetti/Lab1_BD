@@ -5,10 +5,9 @@
 
 
 
-/* OBS: Foram feitas algumas alterações na criação de tabelas envolvendo 
-as constraints da tabela 
-
-*/
+/* OBS: Foram feitas algumas correcoes em relacao a contraints de foreign keys.
+Segue abaixo o script de criação das tabelas (todas as estruturas foram mantidas
+da pratica 1 */
 
 --Criacao da tabela Federacao
 CREATE TABLE FEDERACAO (
@@ -228,9 +227,12 @@ CREATE TABLE HABITACAO (
     /*Caso a comunidade seja deletada, nao faz sentido a habitacao continuar exsitindo, ja que ela depende da comunidade para ser definida*/
 );
 
--- -----------------------------------------------------------------
+-- ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- INICIO PRATICA 2
 
 
+-- EXERCICIO 1 - INSERCAO DE DADOS
 
 -- Inserindo dados na tabela FEDERACAO
 INSERT INTO FEDERACAO (NOME_FD, DATA_FUND) VALUES ('Aliança Galáctica', TO_DATE('01-01-2200', 'DD-MM-YYYY'));
@@ -294,9 +296,9 @@ INSERT INTO PARTICIPA (FACCAO, COM_ESPECIE, COM_NOME) VALUES ('Conservadores Có
 INSERT INTO HABITACAO (PLANETA, COM_ESPECIE, COM_NOME, DT_INICIO, DT_FIM) VALUES ('Terra', 'Humanos', 'Metropolis', TO_DATE('2200-01-01', 'YYYY-MM-DD'), NULL);
 INSERT INTO HABITACAO (PLANETA, COM_ESPECIE, COM_NOME, DT_INICIO, DT_FIM) VALUES ('Marte', 'Marcianos', 'Red Valley', TO_DATE('2200-01-01', 'YYYY-MM-DD'), TO_DATE('2300-12-31', 'YYYY-MM-DD'));
 
--- ---------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- QUESTAO 2
+-- EXERCICIO 2 - UPDATES
 
 -- a)
 UPDATE FEDERACAO SET
@@ -329,7 +331,7 @@ para NULL */
 
 -- ---------------------------------------------------------------------------
 
--- QUESTAO 3
+-- EXERCICIO 3 - DELETES
 
 -- a)
 DELETE FROM SISTEMA WHERE ESTRELA = '123456';
@@ -356,25 +358,26 @@ referencia a essa estrela nas tabelas de Sistema, OrbitaEstrela e OrbitaPlaneta 
 
 -- ----------------------------------------------------------------------
 
--- Exercício 4
--- 4.a)
+-- EXERCICIO 4 - ALTERACOES
+
+-- a)
 /* Foi executada a seguinte alteracao, adicionando o atributo NIVEL_TECNOLOGICO  em especie,
 como ele nao eh um atributo NOT NULL, eh atribuido o valor NULL a esse atributo nas tabelas ja existentes*/
 ALTER TABLE ESPECIE
 ADD NIVEL_TECNOLOGICO VARCHAR2(10);
 
--- 4.b)
+-- b)
 /* Alterando a tabela PLANETA, adicionamos o atributo EH_HABITADO, um booleano que admite S para SIM e N
 para NAO, como foi estabelecido que o DEFAULT seria N, as tuplas ja existentes admitem o valor N nesse atributo*/
 ALTER TABLE PLANETA
 ADD EH_HABITADO CHAR(1) DEFAULT 'N' CHECK (EH_HABITADO IN ('S', 'N'));
 
--- 4.c)
+-- c)
 /* Foi dropada a constraint que checava o cargo do lider*/ 
 ALTER TABLE LIDER
 DROP CONSTRAINT CK_CARGOLIDER;
 
--- 4.d)
+-- d)
 /* Criando um novo CHECK exatamente para o atributo de cargo que acabamos de dropar, mas agora
 testando para novos cargos, a primeira tentativa foi fazer da seguinte forma:*/
 -- [VERSAO QUE DA ERRO] ALTER TABLE LIDER ADD CONSTRAINT CK_CARGO CHECK (UPPER(CARGO) IN ('EXPLORADOR', 'DIPLOMATA', 'ENGENHEIRO'));
@@ -402,7 +405,13 @@ MODIFY (DATA_FUND DEFAULT SYSDATE);
 ALTER TABLE ESPECIE
 MODIFY EH_INTELIGENTE CHAR;
 
--- 4.g)
+
+
+-- f)
+-- i
+
+
+-- g)
 -- i
 /* Vamos remover a tabela FEDERACAO do sistema. Esta tabela é referenciada pela tabela NACAO. 
 Analisando a estrutura e dados da tabela FEDERACAO:*/
