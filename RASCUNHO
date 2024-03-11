@@ -1,13 +1,46 @@
+
+
+-- i Analisando tabela Estrela:
+
+/* A tabela Estrela é composta por 7 atributos (ID_CATALOGO, NOME, CLASSIFICACAO,
+MASSA, COORDENADA_X, COORDENADA_Y e COORDENADA_Z), sendo que sua chave primária é
+definida por ID_CATALOGO. Alem da constraint de primary key, temos NOT NULL para
+os atributos ID_CATALOGO, COORDENADA_X, COORDENADA_Y e COORDENADA_Z. Essa tabela
+possui chave secundaria, composta pela combinacao de COORDENADA_X, COORDENADA_Y e
+COORDENADA_Z.
+
+Foram inseridas as seguintes tuplas na tabela Estrela:
+
+ID_CATALOGO   NOME                 CLASSIFICACAO   MASSA                            COORDENADA_X  COORDENADA_Y  COORDENADA_Z
+123456	      Sol	                 Classe G	       1989000000000000000000000000000	  1	            2	            3
+654321	      Alpha Centauri A	   Classe M		     (null)                             4	            5	            6
+
+*/
+
+
+-- ii Removendo atributos que definem a chave primaria de Estrela
+
+ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO;
 /* Ao tentar excluir a coluna referente a chave primaria de Estrela ID_CATALOGO,
 utilizando o comando ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO, a operacao foi
-impedida devido a existencia de constraints que referenciam esse atributo. 
+impedida devido a existencia de constraints que referenciam esse atributo */
 
-Sendo assim, utilizamos o comando ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO CASCADE CONSTRAINTS.
-com ele, a tabela Estrela agora nao possui nenhuma chave primaria. A constraint de PRIMARY KEY
-de Estrela tambem deixou de existir.
+ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO CASCADE CONSTRAINTS;
+/* Sendo assim, utilizamos o comando ALTER TABLE ESTRELA DROP COLUMN ID_CATALOGO CASCADE CONSTRAINTS.
+com ele, a tabela Estrela agora nao possui nenhuma chave primaria, ja que A constraint de PRIMARY KEY
+de Estrela  deixou de existir. 
+
+Nos dados inseridos em Estrela, agora temos:
+
+NOME                 CLASSIFICACAO   MASSA                            COORDENADA_X  COORDENADA_Y  COORDENADA_Z
+Sol	                 Classe G	       1989000000000000000000000000000	1	            2           	3
+Alpha Centauri A	   Classe M		     (null)                           4	            5           	6
+
 
 Em relacao as tabelas que referenciam Estrela (Sistema, OrbitaEstrela e OrbitaPlaneta),
 os valores que referenciavam a PK de estrela foram mantidos. No entanto, todas as constraints
-de FOREIGN KEY foram removidas
+de FOREIGN KEY referentes a Estrela nessas tabelas foram removidas
 
 */
+
+
