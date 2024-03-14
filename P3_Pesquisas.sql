@@ -128,3 +128,37 @@ SELECT H.PLANETA, H.COM_ESPECIE AS ESPECIE,
 COUNT(*) AS QTD_COMUNIDADES
 FROM HABITACAO H
 GROUP BY H.PLANETA, H.COM_ESPECIE;
+
+
+
+
+
+-- 3.F)
+-- insercao de mais um planeta que orbita o Sol, que eh a estrela escolhida nesse exercicio
+INSERT INTO ORBITAPLANETA (PLANETA, ESTRELA, DISTANCIA_MIN, DISTANCIA_MAX, PERIODO) VALUES ('Venus', '123456', 10, 50, 225);
+-- insercao dos 2 planetas que orbitam o Sol orbitando tambem Aldebaran, ela que deve aparecer no select
+INSERT INTO ORBITAPLANETA (PLANETA, ESTRELA, DISTANCIA_MIN, DISTANCIA_MAX, PERIODO) VALUES ('Venus', '10987', 10, 50, 225);
+INSERT INTO ORBITAPLANETA (PLANETA, ESTRELA, DISTANCIA_MIN, DISTANCIA_MAX, PERIODO) VALUES ('Terra', '10987', 10, 50, 225);
+-- insercao de 1 dos planetas que orbita o Sol orbitando tambem Sirius, ela nao deve aparecer no select
+INSERT INTO ORBITAPLANETA (PLANETA, ESTRELA, DISTANCIA_MIN, DISTANCIA_MAX, PERIODO) VALUES ('Terra', '78910', 10, 50, 225);
+
+/* A subconsulta aqui verifica se para cada planeta orbitando a estrela selecionada,
+existe uma relacao na tabela ORBITAPLANETA para o Sol e esse planeta.
+Se nao existir essa relacao para algum planeta orbitando a estrela, ela nao
+eh selecionada na consulta principal*/
+
+SELECT DISTINCT E.NOME, E.CLASSIFICACAO
+FROM ESTRELA E
+WHERE NOT EXISTS (
+    SELECT P.DESIGNACAO_ASTRONOMICA
+    FROM ORBITAPLANETA OP1
+    JOIN PLANETA P ON OP1.PLANETA = P.DESIGNACAO_ASTRONOMICA
+    WHERE OP1.ESTRELA = '123456'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM ORBITAPLANETA OP2
+        WHERE OP2.ESTRELA = E.ID_CATALOGO
+        AND OP2.PLANETA = P.DESIGNACAO_ASTRONOMICA
+    )
+);
+
