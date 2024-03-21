@@ -168,6 +168,14 @@ Predicate Information (identified by operation id):
    1 - filter(UPPER("NOME")='MINUS MAGNI.')
 */
 
+ /* Na primeira consulta, onde a comparação é direta entre a coluna 'nome' e 'Minus magni.',
+o otimizador escolheu usar um índice único para acessar os dados, resultando em uma operação 
+eficiente e acesso direto à linha desejada na tabela 'nacao'. Já na segunda consulta, onde é 
+aplicada a função UPPER() na coluna 'nome' e comparada com 'MINUS MAGNI.', o otimizador optou 
+por uma leitura completa da tabela ('TABLE ACCESS FULL') devido ao uso da função, que impede 
+a utilização eficiente de índices. Essa diferença ocorre porque o uso de funções em predicados
+de consulta pode invalidar o uso de índices existentes, levando a uma abordagem menos eficiente
+em termos de desempenho. */
 
 
 
