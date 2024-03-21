@@ -122,11 +122,112 @@ eficiente.
 
 
 
+-- 4-
+-- a) Fazendo as buscas e analisando o Plano de Execucoes
+explain plan for
+select * from planeta where massa between 0.1 and 10;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     6 |   354 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |     6 |   354 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<=10 AND "MASSA">=0.1)
+*/
+
+explain plan for
+select * from planeta where massa between 0.1 and 3000;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |  1580 | 93220 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |  1580 | 93220 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<=3000 AND "MASSA">=0.1)
+*/
+
+-- b) Criando indice para o atributo classificacao:
+create index idx_massa on planeta (massa);
+
+
+-- c) Analisando novamente o desemprenho das buscas apos a criacao do index:
+
+explain plan for
+select * from planeta where massa between 0.1 and 10;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+/*
+Plan hash value: 1147402337
+ 
+-------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |           |     6 |   354 |     9   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| PLANETA   |     6 |   354 |     9   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_MASSA |     6 |       |     2   (0)| 00:00:01 |
+-------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("MASSA">=0.1 AND "MASSA"<=10)
+*/
 
 
 
+explain plan for
+select * from planeta where massa between 0.1 and 3000;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |  1580 | 93220 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |  1580 | 93220 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<=3000 AND "MASSA">=0.1)
+*/
 
 
+
+/*
+ANALISANDO:
+Na primeira pesquisa, 
+
+
+Na segunda pesquisa, a estrutura de indice nao foi utilizada na busca
 
 
 
