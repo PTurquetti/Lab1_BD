@@ -1,5 +1,5 @@
 
--- 2
+-- QUEATAO 2 ---------------------------------------------------------------------------------------------------------
 
 -- a) Fazendo as buscas e analisando o Plano de Execucoes
 explain plan for
@@ -119,10 +119,59 @@ eficiente.
 
 */
 
+-- QUEATAO 3 ---------------------------------------------------------------------------------------------------------
+
+-- a) Fazendo as buscas e analisando o Plano de Execucoes
+explain plan for
+select * from nacao where nome = 'Minus magni.';
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 718961691
+ 
+----------------------------------------------------------------------------------------
+| Id  | Operation                   | Name     | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT            |          |     1 |    30 |     2   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID| NACAO    |     1 |    30 |     2   (0)| 00:00:01 |
+|*  2 |   INDEX UNIQUE SCAN         | PK_NACAO |     1 |       |     1   (0)| 00:00:01 |
+----------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("NOME"='Minus magni.')
+*/
 
 
 
--- 4-
+explain plan for
+select * from nacao where upper(nome) = 'MINUS MAGNI.';
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+/*
+Plan hash value: 2698598799
+ 
+---------------------------------------------------------------------------
+| Id  | Operation         | Name  | Rows  | Bytes | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |       |   498 | 14940 |    69   (2)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| NACAO |   498 | 14940 |    69   (2)| 00:00:01 |
+---------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter(UPPER("NOME")='MINUS MAGNI.')
+*/
+
+
+
+
+-- QUEATAO 4 ---------------------------------------------------------------------------------------------------------
 -- a) Fazendo as buscas e analisando o Plano de Execucoes
 explain plan for
 select * from planeta where massa between 0.1 and 10;
