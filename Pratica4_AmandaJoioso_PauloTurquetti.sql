@@ -578,7 +578,20 @@ Predicate Information (identified by operation id):
 O banco de dados optou por não utilizar o índice nesta consulta e fazer uma leitura completa da tabela. 
 Isso acontece devido à presença da operação OR na cláusula WHERE. O uso do operador OR pode dificultar a 
 utilização eficiente de índices, pois o banco precisa considerar duas condições separadas. Neste caso, para 
-satisfazer a condição classificacao = 'M3', o índice pode ser útil, mas para a condição massa < 1, o índice não é tão eficaz
+satisfazer a condição classificacao = 'M3', o índice pode ser útil, mas para a condição massa < 1, o índice 
+não é tão eficaz
 
-2. 
+2. Consulta 2: select * from estrela where classificacao = 'M3';
+O banco de dados optou por utilizar o índice IDX_CLASS_MASSA nesta consulta, porque a consulta tem uma única condição 
+na coluna classificacao, e o índice na coluna classificacao é eficiente para localizar rapidamente as linhas correspondentes. 
+Portanto, o banco optou por realizar uma varredura no índice (INDEX RANGE SCAN), o que torna a operação mais eficiente.
+
+3. Consulta 3 (select * from estrela where massa < 1;);
+O banco de dados optou por não utilizar o índice nesta consulta, provavelmente porque a condição massa < 1 por si só não é tão
+seletiva, o que significa que muitas linhas da tabela podem atender a essa condição. Como resultado, o otimizador de consultas 
+considerou que o uso de um índice não seria tão eficiente quanto uma leitura completa da tabela. Diferentemente do que aconteceu
+na consulta 2 e na consulta inicial, já que a condição classificação = M3 deve ser mais seletiva e por isso o banco de dados
+encara como mais eficiente usar o índice.
 */
+
+
