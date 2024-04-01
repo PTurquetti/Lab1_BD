@@ -55,6 +55,10 @@ está examinando todas as linhas da tabela para encontrar as que correspondem ao
 -- b)
 CREATE INDEX idx_classificacao ON planeta (classificacao);
 
+/* 
+Utilizamos a indexação por B-tree para as consultas fornecidas, pois estamos buscando valores específicos na
+coluna classificacao, assim, ele é a escolha mais apropriada devido à sua eficiência na busca por igualdades exatas.
+*/
 
 -- c)
 explain plan for
@@ -104,7 +108,13 @@ Predicate Information (identified by operation id):
    2 - access("CLASSIFICACAO"='Confirmed')
 */
 
-
+/* 
+Após a criação do índice, ambos os planos de execução mostram que o banco de dados está utilizando o
+índice IDX_CLASSIFICACAO através de uma operação INDEX RANGE SCAN. Isso indica uma busca direta e eficiente
+das linhas correspondentes aos valores específicos da coluna classificacao por meio do índice, em vez de 
+percorrer todas as linhas da tabela. Como resultado, o custo total de execução das consultas foi drasticamente 
+reduzido para apenas 3 unidades de custo.
+*/
 
 
 -- QUEATAO 3 ---------------------------------------------------------------------------------------------------------
