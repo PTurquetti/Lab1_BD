@@ -595,3 +595,51 @@ encara como mais eficiente usar o índice.
 */
 
 
+
+-- QUEATAO 7 ---------------------------------------------------------------------------------------------------------
+
+-- Analisando o desempenho da consulta sem a utilização do index:
+EXPLAIN PLAN FOR 
+SELECT CLASSIFICACAO, COUNT(*) FROM ESTRELA
+    GROUP BY CLASSIFICACAO;
+    
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 2618708603
+ 
+------------------------------------------------------------------------------
+| Id  | Operation          | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |         |  1235 |  6175 |    16   (7)| 00:00:01 |
+|   1 |  HASH GROUP BY     |         |  1235 |  6175 |    16   (7)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL| ESTRELA |  6586 | 32930 |    15   (0)| 00:00:01 |
+------------------------------------------------------------------------------
+*/
+
+--Criando o indice:
+CREATE BITMAP INDEX IDX_CLASSIFICACAO ON ESTRELA(classificacao);
+
+--Analisando o desempepnho da busca após a criação do index:
+EXPLAIN PLAN FOR 
+SELECT CLASSIFICACAO, COUNT(*) FROM ESTRELA
+    GROUP BY CLASSIFICACAO;
+    
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+/*Plan hash value: 3865298374
+ 
+---------------------------------------------------------------------------------------------------
+| Id  | Operation                     | Name              | Rows  | Bytes | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT              |                   |  1235 |  6175 |     8  (25)| 00:00:01 |
+|   1 |  HASH GROUP BY                |                   |  1235 |  6175 |     8  (25)| 00:00:01 |
+|   2 |   BITMAP CONVERSION COUNT     |                   |  6586 | 32930 |     6   (0)| 00:00:01 |
+|   3 |    BITMAP INDEX FAST FULL SCAN| IDX_CLASSIFICACAO |       |       |            |          |
+---------------------------------------------------------------------------------------------------
+*/
+
+
+
+
