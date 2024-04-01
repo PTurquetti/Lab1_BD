@@ -435,7 +435,150 @@ eficientes. Como contrapeso, há o custo de espaco do bitmap.
 */
 
 
+-- QUEATAO 6 ---------------------------------------------------------------------------------------------------------
 
+-- a)
+explain plan for
+select * from estrela where classificacao = 'M3' and massa < 1;
 
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
 
+-- Performance antes da criação do índice
+/* 
+Plan hash value: 1653849300
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     1 |    46 |    15   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| ESTRELA |     1 |    46 |    15   (0)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<1 AND "CLASSIFICACAO"='M3')
+*/
 
+/*
+No caso, as colunas classificacao e massa foram escolhidas como chaves do índice. A escolha desse tipo de índice foi 
+feita porque a consulta envolve uma filtragem simultânea nessas duas colunas. Ao criar um índice de chave composta nessas
+colunas, o banco de dados pode encontrar rapidamente as linhas que correspondem aos critérios da consulta, pois o índice 
+estará organizado de forma a facilitar a busca por valores específicos de classificacao e massa. Isso resultará em uma melhoria 
+significativa no desempenho da consulta, pois o banco de dados pode usar o índice para localizar diretamente as linhas relevantes, 
+em vez de percorrer toda a tabela.
+*/
+
+CREATE INDEX idx_class_massa ON estrela (classificacao, massa);
+
+explain plan for
+select * from estrela where classificacao = 'M3' and massa < 1;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+-- Performance depois da criação do índice
+/*
+Plan hash value: 2258764018
+ 
+-------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name            | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                 |     1 |    46 |     3   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| ESTRELA         |     1 |    46 |     3   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_CLASS_MASSA |     1 |       |     2   (0)| 00:00:01 |
+-------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("CLASSIFICACAO"='M3' AND "MASSA"<1)
+*/
+
+/* 
+Agora, o otimizador de consultas utiliza o índice IDX_CLASS_MASSA por meio de uma operação de varredura de 
+intervalo (INDEX RANGE SCAN). Isso significa que o banco de dados está acessando diretamente as linhas relevantes 
+usando o índice, em vez de realizar uma leitura completa da tabela ESTRELA. Como resultado, o custo de execução da 
+consulta foi reduzido para apenas 3 unidades, indicando uma operação mais eficiente e um tempo de execução mais rápido. 
+A utilização do índice de chave composta permitiu ao banco de dados localizar rapidamente as linhas que correspondem 
+aos critérios da consulta.
+*/
+
+-- b)
+explain plan for
+select * from estrela where classificacao = 'M3' or massa < 1;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 1653849300
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     6 |   276 |    15   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| ESTRELA |     6 |   276 |    15   (0)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("CLASSIFICACAO"='M3' OR "MASSA"<1)
+*/
+
+explain plan for
+select * from estrela where classificacao = 'M3';
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 2258764018
+ 
+-------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name            | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                 |     5 |   230 |     8   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| ESTRELA         |     5 |   230 |     8   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_CLASS_MASSA |     5 |       |     2   (0)| 00:00:01 |
+-------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("CLASSIFICACAO"='M3')
+*/
+
+explain plan for
+select * from estrela where massa < 1;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 1653849300
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     1 |    46 |    15   (0)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| ESTRELA |     1 |    46 |    15   (0)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<1)
+*/
+
+/* 
+1. Consulta 1: select * from estrela where classificacao = 'M3' or massa < 1;
+O banco de dados optou por não utilizar o índice nesta consulta e fazer uma leitura completa da tabela. 
+Isso acontece devido à presença da operação OR na cláusula WHERE. O uso do operador OR pode dificultar a 
+utilização eficiente de índices, pois o banco precisa considerar duas condições separadas. Neste caso, para 
+satisfazer a condição classificacao = 'M3', o índice pode ser útil, mas para a condição massa < 1, o índice não é tão eficaz
+
+2. 
+*/
