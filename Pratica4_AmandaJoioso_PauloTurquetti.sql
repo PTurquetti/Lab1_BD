@@ -211,6 +211,124 @@ anteriormente, indicando uma melhoria na eficiência da consulta. Com menos byte
 a execução da consulta também foi reduzido.
 */
 
+-- QUEATAO 4 ---------------------------------------------------------------------------------------------------------
+-- a)
+explain plan for
+select * from planeta where massa between 0.1 and 10;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     6 |   354 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |     6 |   354 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<=10 AND "MASSA">=0.1)
+*/
+
+explain plan for
+select * from planeta where massa between 0.1 and 3000;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |  1579 | 93161 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |  1579 | 93161 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<=3000 AND "MASSA">=0.1)
+*/
+
+/*
+Analisando os planos de execução gerados pelo otimizador para as consultas fornecidas, podemos observar
+que ambas as consultas estão realizando uma leitura completa da tabela PLANETA (TABLE ACCESS FULL), a consulta
+está examinando todas as linhas da tabela para encontrar as que correspondem ao critério de busca independentemente
+dos valores específicos do intervalo de massa fornecido.
+*/
+
+-- b)
+create index idx_massa on planeta (massa);
+
+/*
+Optamos por um índice B-tree porque ele é eficiente para consultas que envolvem intervalos. Um índice B-tree organiza
+os valores em uma estrutura de árvore balanceada, permitindo que o banco de dados localize rapidamente as linhas que
+correspondem aos valores especificados no intervalo. Apesar de no início parecer ideal o uso de um function-based index,
+pois parece realizar uma função na busca, não seria tão eficaz quanto um índice do tipo B-tree, porque um function-based index
+é útil quando a função aplicada na coluna é determinística e sempre produz o mesmo resultado para um determinado valor de entrada.
+*/
+
+-- c)
+explain plan for
+select * from planeta where massa between 0.1 and 10;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+/*
+Plan hash value: 1147402337
+ 
+-------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name      | Rows  | Bytes | Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |           |     6 |   354 |     9   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| PLANETA   |     6 |   354 |     9   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_MASSA |     6 |       |     2   (0)| 00:00:01 |
+-------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("MASSA">=0.1 AND "MASSA"<=10)
+*/
+
+explain plan for
+select * from planeta where massa between 0.1 and 3000;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |  1579 | 93161 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |  1579 | 93161 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("MASSA"<=3000 AND "MASSA">=0.1)
+*/
+
+/* 
+ Para a consulta com o intervalo mais restrito (0.1 a 10), o otimizador optou por uma busca eficiente usando o 
+índice de intervalo na coluna massa, resultando em baixo custo de execução e operação rápida. No entanto, para 
+o intervalo mais amplo (0.1 a 3000), o otimizador escolheu manter a leitura completa da tabela, evitando o uso
+do índice devido à amplitude do intervalo, resultando em um custo de execução maior e potencialmente em uma 
+operação mais lenta. Essa decisão demonstra a importância de considerar a distribuição dos dados e a seletividade 
+dos valores ao otimizar consultas com intervalos.
+*/
+
 -- QUEATAO 5 ---------------------------------------------------------------------------------------------------------
 
 
