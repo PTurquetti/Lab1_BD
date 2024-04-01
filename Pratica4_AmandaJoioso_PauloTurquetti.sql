@@ -1,5 +1,108 @@
 -- QUEATAO 2 ---------------------------------------------------------------------------------------------------------
+-- a)
+explain plan for
+select * from planeta
+where classificacao = 'Dolores autem maxime fuga.';
 
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     1 |    59 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |     1 |    59 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("CLASSIFICACAO"='Dolores autem maxime fuga.')
+*/
+
+explain plan for
+select * from planeta where classificacao = 'Confirmed';
+
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 2930980072
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         |     1 |    59 |   137   (1)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| PLANETA |     1 |    59 |   137   (1)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("CLASSIFICACAO"='Confirmed')
+*/
+
+/* 
+Analisando os planos de execução gerados pelo otimizador para as consultas fornecidas, podemos observar
+que ambas as consultas estão realizando uma leitura completa da tabela PLANETA (TABLE ACCESS FULL), a consulta
+está examinando todas as linhas da tabela para encontrar as que correspondem ao critério de busca.
+*/
+
+-- b)
+CREATE INDEX idx_classificacao ON planeta (classificacao);
+
+
+-- c)
+explain plan for
+select * from planeta
+where classificacao = 'Dolores autem maxime fuga.';
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+Plan hash value: 1267387943
+ 
+---------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name              | Rows  | Bytes | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                   |     1 |    59 |     3   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| PLANETA           |     1 |    59 |     3   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_CLASSIFICACAO |     1 |       |     1   (0)| 00:00:01 |
+---------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("CLASSIFICACAO"='Dolores autem maxime fuga.')
+ */
+ 
+explain plan for
+select * from planeta where classificacao = 'Confirmed';
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/* 
+Plan hash value: 1267387943
+ 
+---------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name              | Rows  | Bytes | Cost (%CPU)| Time     |
+---------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                   |     1 |    59 |     3   (0)| 00:00:01 |
+|   1 |  TABLE ACCESS BY INDEX ROWID BATCHED| PLANETA           |     1 |    59 |     3   (0)| 00:00:01 |
+|*  2 |   INDEX RANGE SCAN                  | IDX_CLASSIFICACAO |     1 |       |     1   (0)| 00:00:01 |
+---------------------------------------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   2 - access("CLASSIFICACAO"='Confirmed')
+*/
 
 
 
@@ -53,12 +156,6 @@ o que torna a busca mais lenta e menos eficiente.
 -- b)
 CREATE INDEX idx_upper_nome ON nacao (UPPER(nome));
 
-explain plan for
-select * from nacao where upper(nome) = 'MINUS MAGNI.';
-
-SELECT plan_table_output
-FROM TABLE(dbms_xplan.display());
-
 /* 
 Para a consulta SELECT * FROM nacao WHERE UPPER(nome) = 'MINUS MAGNI.', considerando que estamos fazendo uma
 comparação exata e que o valor a ser comparado é fixo e em maiúsculas (uma função), o tipo de índice mais
@@ -71,6 +168,12 @@ encontrar rapidamente as linhas correspondentes ao valor 'MINUS MAGNI.' em maiú
 */
 
 -- c)
+
+explain plan for
+select * from nacao where upper(nome) = 'MINUS MAGNI.';
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
 
 /* 
 Plan hash value: 2752779757
