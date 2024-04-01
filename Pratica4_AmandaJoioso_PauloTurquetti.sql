@@ -640,6 +640,31 @@ FROM TABLE(dbms_xplan.display());
 ---------------------------------------------------------------------------------------------------
 */
 
+/*
+
+Explicando o raciocínio utilizado:
+
+Quando nos deparamos com a pesquisa, pensamos logo que, por se tratar do atributo  classificação, 
+haveriam vários valores repetidos e, sendo assim, uma baixa cardinalidade. No entanto, ao realizar
+a busca, vimos várias classificações, de modo que na grande maioria delas somente um astro se encaixa, 
+passando a ideia de que a baixa cardinalidade poderia não ser verdade.
+
+Pensando nisso, implementamos primeiramente um índice por árvore B (comum), pensando inclusive que o 
+sgbd teria maior facilidade de realizar a operação count já que os elementos nessa estrutura são organizados
+em sequência. Porém, ao analiar o desempenho da busca, vimos que a estrutura de índice não estava sendo
+utilizada, de modo a apresentar um desempenho idêntico à pesquisa sem índice.
+
+Foi então que revivemos a ideia de utilizar o bitmap index, e dessa vez a pesquisa foi mais eficiente, com
+um custo reduzido pela metade, apesar de maior uso da CPU. Isso nos fez perceber que a teoria da baixa cardinalidade
+pode ser aplicada nesse atributo, apesar de visualmente parecer o contrário. Além disso, outro fator que contribuiu 
+com essa melhora de desempenho foi a redução do acesso à tabela e a alta eficiência do índice na realização da
+operação GROUP BY.
+
+*/
+
+
+-- QUEATAO 8 ---------------------------------------------------------------------------------------------------------
+
 
 
 
