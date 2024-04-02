@@ -1,6 +1,7 @@
 /* Pratica 4
-Paulo Turquetti - 13750791
-Amanda Joioso
+
+Amanda Valukas Breviglieri Joioso - 4818232
+Paulo Henrique Vedovatto Turquetti - 13750791
 */
 
 
