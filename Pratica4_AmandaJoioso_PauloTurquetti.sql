@@ -1,3 +1,9 @@
+/* Pratica 4
+Paulo Turquetti - 13750791
+Amanda Joioso
+*/
+
+
 -- QUEATAO 2 ---------------------------------------------------------------------------------------------------------
 -- a)
 explain plan for
@@ -664,6 +670,75 @@ operação GROUP BY.
 
 
 -- QUEATAO 8 ---------------------------------------------------------------------------------------------------------
+
+-- Consulta a ser analisada: mostra a quantidade de especies em cada categoria de planeta
+EXPLAIN PLAN FOR
+SELECT P.CLASSIFICACAO, COUNT(E.NOME)
+FROM ESPECIE E
+RIGHT JOIN PLANETA P ON E.planeta_or = P.id_astro
+GROUP BY CLASSIFICACAO;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+
+/*
+-------------------------------------------------------------------------------------------
+| Id  | Operation              | Name     | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |          | 49896 |  3605K|       |  1116   (1)| 00:00:01 |
+|   1 |  HASH GROUP BY         |          | 49896 |  3605K|  4560K|  1116   (1)| 00:00:01 |
+|*  2 |   HASH JOIN RIGHT OUTER|          | 55155 |  3985K|       |   210   (3)| 00:00:01 |
+|   3 |    VIEW                | VW_GBC_5 | 32668 |   861K|       |    72   (6)| 00:00:01 |
+|   4 |     HASH GROUP BY      |          | 32668 |   446K|       |    72   (6)| 00:00:01 |
+|   5 |      TABLE ACCESS FULL | ESPECIE  | 49994 |   683K|       |    69   (2)| 00:00:01 |
+|   6 |    TABLE ACCESS FULL   | PLANETA  | 55155 |  2531K|       |   137   (1)| 00:00:01 |
+-------------------------------------------------------------------------------------------*/
+
+-- Criando um bitmap join index
+CREATE BITMAP INDEX BJI_ESPECIE_PLANETA
+ON ESPECIE(P.CLASSIFICACAO)
+FROM ESPECIE E, PLANETA P
+WHERE E.PLANETA_OR = P.ID_ASTRO;
+
+/* Aqui estamos criando um bitmap na tabela especie onde será indexado a coluna PLANETA.CLASSIFICACAO.
+Esse indice faz com que não haja a necessidade de acessar completamente a tabela de Planeta, já que a única
+informação que demanda o acesso à essa tabela estará indexada na tabela Especie.
+
+Vamos agora analisar o resultado da busca após a criação do bitmap join index:
+*/
+
+EXPLAIN PLAN FOR
+SELECT P.CLASSIFICACAO, COUNT(E.NOME)
+FROM ESPECIE E
+RIGHT JOIN PLANETA P ON E.planeta_or = P.id_astro
+GROUP BY CLASSIFICACAO;
+
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
+/*-------------------------------------------------------------------------------------------
+| Id  | Operation              | Name     | Rows  | Bytes |TempSpc| Cost (%CPU)| Time     |
+-------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |          | 49896 |  3605K|       |  1116   (1)| 00:00:01 |
+|   1 |  HASH GROUP BY         |          | 49896 |  3605K|  4560K|  1116   (1)| 00:00:01 |
+|*  2 |   HASH JOIN RIGHT OUTER|          | 55155 |  3985K|       |   210   (3)| 00:00:01 |
+|   3 |    VIEW                | VW_GBC_5 | 32668 |   861K|       |    72   (6)| 00:00:01 |
+|   4 |     HASH GROUP BY      |          | 32668 |   446K|       |    72   (6)| 00:00:01 |
+|   5 |      TABLE ACCESS FULL | ESPECIE  | 49994 |   683K|       |    69   (2)| 00:00:01 |
+|   6 |    TABLE ACCESS FULL   | PLANETA  | 55155 |  2531K|       |   137   (1)| 00:00:01 |
+-------------------------------------------------------------------------------------------*/
+
+/* Observações:
+
+A criação do bitmap join index facilita a busca devido à indexação do atributo Classificacao na
+tabela de especie, já que tanto atributos de espécie e Planeta.Classificação serão utilizados na busca,
+configurando a necessidade de uma junção entre essas tabelas. No entanto, podemos observar que o
+otimizador optou por acessar as duas tabelas inteiramente. Isso provavelmente acontece devidoà complexidade
+da pesquisa ou então devido à grande diversidade de valores permitidos por Planeta.Classificação. */
+
+
+
+
+
 
 
 
