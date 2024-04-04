@@ -10,6 +10,11 @@ Paulo Henrique Vedovatto Turquetti - 13750791
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('111.111.111-11', 'Capitã Aria No', 'CIENTISTA', 'Quam quia ad.', 'Quidem quam');
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('222.222.222-22', 'General Zorg', 'COMANDANTE', 'Veniam est.', 'Unde eius at');
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('333.333.333-33', 'Buzz Lightyear', 'OFICIAL', 'Modi porro ut.', 'Iure sunt quas');
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('444.444.444-44', 'Darth Vader', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('555.555.555-55', 'Luke Sky', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('666.666.666-66', 'Spok', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('777.777.777-77', 'Groot', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
+
 
 -- Inserindo dados na tabela FACCAO
 INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Prog Celestiais', '111.111.111-11', 'PROGRESSITA', 3);
@@ -51,6 +56,9 @@ INSERT INTO VIEW_FACCAO VALUES ('Uspianos', '111.111.111-11');
 essa view não é atualizável, já que possui WITH READ ONLY. Sendo assim, não será possível fazer operações de inserção,
 alteração ou remoção de dados. */
 
+
+
+
 -- QUESTAO 2 -------------------------------------------------------------------------------------------------------------
 
 -- Crie duas views atualizáveis das faccoes (nome, lider, ideologia)
@@ -61,4 +69,94 @@ CREATE OR REPLACE VIEW VIEW_FACCAO_2 AS
     FROM FACCAO
     WHERE UPPER(IDEOLOGIA) = 'TRADICIONALISTA';
 
--- Inserindo uma faccao tradicionalista:
+-- Inserindo uma faccao tradicionalista na viwe:
+INSERT INTO VIEW_FACCAO_2 VALUES ('Uspianos', '444.444.444-44', 'TRADICIONALISTA');
+
+
+-- Inserindo uma facção não tradicionalista na view:
+INSERT INTO VIEW_FACCAO_2 VALUES ('Jedis do Bem', '555.555.555-55', 'PROGRESSITA');
+
+/* 
+
+Tabela FACCAO:
+Prog Celestiais	111.111.111-11	PROGRESSITA	3
+Cons Cósmicos	222.222.222-22	TRADICIONALISTA	
+Prog e Além	333.333.333-33	PROGRESSITA	
+Uspianos	444.444.444-44	TRADICIONALISTA	
+Jedis do Bem	555.555.555-55	PROGRESSITA	
+
+Tabela VIEW_FACCAO_2
+Cons Cósmicos	222.222.222-22	TRADICIONALISTA
+Uspianos	444.444.444-44	TRADICIONALISTA
+
+Podemos analisar que, ao fazermos o insert na nossa view, ambas as tuplas foram inseridas na tabela FACCAO.
+No entanto, ao vizualizar a nossa view, iremos encontrar somente a tupla correspondente à faccao TRADICIONALISTA.
+Isso acontece devido a clausula WHERE UPPER(IDEOLOGIA) = 'TRADICIONALISTA' na nossa view.
+
+*/
+
+
+-- b)  View que não permite a insercao de faccoes nao tradicionalistas:
+CREATE OR REPLACE VIEW VIEW_FACCAO_3 AS
+    SELECT NOME, LIDER, IDEOLOGIA
+    FROM FACCAO
+    WHERE UPPER(IDEOLOGIA) = 'TRADICIONALISTA'
+WITH CHECK OPTION;
+
+-- Inserindo uma faccao tradicionalista na view:
+INSERT INTO VIEW_FACCAO_3 VALUES ('StarTrack', '666.666.666-66', 'TRADICIONALISTA');
+-- INSERIDO COM SUCESSO
+
+-- Inserindo uma faccao tradicionalista na view:
+INSERT INTO VIEW_FACCAO_3 VALUES ('G. Galaxias', '777.777.777-77', 'PROGRESSITA');
+-- ERRO: violação da cláusula where da view WITH CHECK OPTION
+
+/* Nessa view, adicionamos o comando WITH CHECK OPTION, responsavel por permitir somente atualizações que respeitem
+a cláusula WHERE. Com isso, serão permitidos inserções apenas de facções tradicionalistas.
+
+Tabela FACCAO
+Prog Celestiais	111.111.111-11	PROGRESSITA	3
+Cons Cósmicos	222.222.222-22	TRADICIONALISTA	
+Prog e Além	333.333.333-33	PROGRESSITA	
+Uspianos	444.444.444-44	TRADICIONALISTA	
+Jedis do Bem	555.555.555-55	PROGRESSITA	
+StarTrack	666.666.666-66	TRADICIONALISTA	
+
+Tabela VIEQ_FACCAO_3
+Cons Cósmicos	222.222.222-22	TRADICIONALISTA
+Uspianos	444.444.444-44	TRADICIONALISTA
+StarTrack	666.666.666-66	TRADICIONALISTA
+
+Podemos ver que tanto na tabela FACCAO quanto na nossa view foi inserido somente a tupla referente à facção tradicionalista
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
