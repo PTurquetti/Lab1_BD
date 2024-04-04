@@ -134,9 +134,17 @@ Podemos ver que tanto na tabela FACCAO quanto na nossa view foi inserido somente
 
 
 
+-- QUESTAO 3 -------------------------------------------------------------------------------------------------------------
 
 
+-- a)
 
+CREATE VIEW VIEW_ORBITA_PLANETA_ESTRELA AS
+SELECT E.NOME AS NOME_ESTRELA, E.X AS COORD_X, E.Y AS COORD_Y, E.Z AS COORD_Z,
+    OP.PLANETA AS ID_PLANETA, P.CLASSIFICACAO AS CLASSIFICACAO_PLANETA
+FROM ORBITA_PLANETA OP
+JOIN ESTRELA E ON OP.ESTRELA = E.ID_ESTRELA
+JOIN PLANETA P ON OP.PLANETA = P.ID_ASTRO;
 
 
 
