@@ -141,8 +141,22 @@ GRANT SELECT, INSERT (ID_ESTRELA, NOME, X, Y, Z) ON ESTRELA TO a12682435;
 -- Grant bem-sucedido.
 
 
+-- d)
+-- Refazer item a e b com user 3
 
 
+
+-- e) 
+REVOKE SELECT, INSERT ON ESTRELA FROM a4818232;
+-- Revoke bem-sucedido.
+
+
+-- QUESTÃO 3 ---------------------------------------------------------------------------------------------------------
+
+-- User 1 concedeprivilegio de busca para user 2:
+GRANT SELECT ON COMUNIDADE TO a4818232;
+
+-- User 2 cria a nova tabela
 
 
 
