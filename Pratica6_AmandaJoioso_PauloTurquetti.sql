@@ -61,10 +61,27 @@ select * from a13750791.ESTRELA;
 -- Busca executada com sucesso
 
 -- ii.
-
-
 GRANT SELECT ON ESTRELA TO a12682435;
 -- Grant bem-sucedido.
+
+
+-- iii.
+-- User 3
+
+
+-- iv.
+REVOKE SELECT ON ESTRELA FROM a4818232;
+-- Revoke bem-sucedido.
+
+
+
+-- v.
+-- user 2:
+
+
+-- User 3:
+
+
 
 
 
