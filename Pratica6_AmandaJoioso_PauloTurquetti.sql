@@ -63,6 +63,8 @@ select * from a13750791.ESTRELA;
 -- ii.
 
 
+GRANT SELECT ON ESTRELA TO a12682435;
+-- Grant bem-sucedido.
 
 
 
