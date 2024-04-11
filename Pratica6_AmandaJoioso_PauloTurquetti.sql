@@ -28,7 +28,8 @@ SELECT * FROM a13750791.ESTRELA;
 -- ii.
 -- User 2 fazendo insercao:
 
-
+INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z) VALUES ('654321', 'Alpha Centauri A', 'M11', NULL, 4.0, 5.0, 6.0);
+-- Erro de SQL: ORA-01031: privilégios insuficientes
 
 
 
