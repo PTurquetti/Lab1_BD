@@ -77,7 +77,14 @@ REVOKE SELECT ON ESTRELA FROM a4818232;
 
 -- v.
 -- user 2:
-
+select * from a13750791.ESTRELA;
+/*
+ORA-00942: a tabela ou view não existe
+00942. 00000 -  "table or view does not exist"
+*Cause:    
+*Action:
+Erro na linha: 5 Coluna: 25
+*/
 
 -- User 3:
 
