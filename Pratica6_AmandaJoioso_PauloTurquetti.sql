@@ -99,6 +99,12 @@ REVOKE SELECT ON ESTRELA FROM a4818232
 
 -- QUESTÃO 2 ---------------------------------------------------------------------------------------------------------
 
+-- Criando privilegio
+GRANT SELECT, INSERT (ID_ESTRELA, NOME, X, Y, Z) ON ESTRELA TO a4818232 WITH GRANT OPTION;
+
+
+-- a)
+
 
 
 
