@@ -137,7 +137,8 @@ Podemos ver que tanto na tabela FACCAO quanto na nossa view foi inserido somente
 -- QUESTAO 3 -------------------------------------------------------------------------------------------------------------
 
 
--- a)
+/* A view VIEW_ORBITA_PLANETA_ESTRELA seleciona o nome, as coordenadas da estrela e o ID e classificação dos planetas que a
+orbitam, combinando dados das tabelas ORBITA_PLANETA, ESTRELA e PLANETA por meio de joins. */
 
 CREATE VIEW VIEW_ORBITA_PLANETA_ESTRELA AS
 SELECT E.NOME AS NOME_ESTRELA, E.X AS COORD_X, E.Y AS COORD_Y, E.Z AS COORD_Z,
@@ -146,7 +147,40 @@ FROM ORBITA_PLANETA OP
 JOIN ESTRELA E ON OP.ESTRELA = E.ID_ESTRELA
 JOIN PLANETA P ON OP.PLANETA = P.ID_ASTRO;
 
+-- a)
 
+-- Para determinar se a view é atualizavel ou não, foram realizadas as seguintes operações:
+
+INSERT INTO VIEW_ORBITA_PLANETA_ESTRELA (NOME_ESTRELA, COORD_X, COORD_Y, COORD_Z, ID_PLANETA, CLASSIFICACAO_PLANETA)
+VALUES ('Estrela da Morte', 10, 20, 30, 'Alderaan', 'Destruido');
+
+UPDATE VIEW_ORBITA_PLANETA_ESTRELA
+SET NOME_ESTRELA = 'Estrela da Morte'
+WHERE NOME_ESTRELA = 'Menkent';
+
+DELETE FROM VIEW_ORBITA_PLANETA_ESTRELA
+WHERE NOME_ESTRELA = 'Menkent';
+
+/* Para as operações de insert e update foi retornado um erro, pois a view VIEW_ORBITA_PLANETA_ESTRELA é baseada
+em um JOIN de três tabelas (ORBITA_PLANETA, ESTRELA e PLANETA). Cada uma dessas tabelas tem sua própria chave primária
+(ID_ESTRELA para ESTRELA, ID_ASTRO para PLANETA e a combinação de PLANETA e ESTRELA para ORBITA_PLANETA). No entanto, a
+view não preserva essas chaves primárias porque uma única linha na view pode corresponder a várias linhas nas tabelas base
+devido ao JOIN, o que pode ser percebido claramente na falha em tentar fazer um insert ou update. Já no caso do delete, ele
+funcionou e excluiu a tupla correspondente da tabela ORBITA_PLANETA, o delete, diferente do insert e do update, funcionou
+pois  a operação de delete pode ser mapeada de forma única para uma operação de delete em uma das tabelas base. Nesse caso,
+a tabela que aparece primeiro na lista FROM do comando CREATE VIEW, que é a tabela ORBITA_PLANETA. */
+
+-- b)
+
+SELECT NOME_ESTRELA, COUNT(ID_PLANETA) AS QUANTIDADE_PLANETAS
+FROM VIEW_ORBITA_PLANETA_ESTRELA
+GROUP BY NOME_ESTRELA;
+
+/* 
+Essa consulta agrupa os registros na view pelo nome da estrela e conta o número de planetas (ID_PLANETA) para cada grupo, que é
+o nome da estrela (NOME_ESTRELA). O resultado é a quantidade de planetas que orbitam cada estrela, no caso 3 (depois do delete no
+item anterior).
+*/
 
 
 
