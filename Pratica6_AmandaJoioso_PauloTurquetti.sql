@@ -9,9 +9,9 @@ Paulo Henrique Vedovatto Turquetti - 13750791
 
 USUÁRIOS:
 
-User 1 - a13750791
-User 2 - a4818232 
-User 3 - Darlam
+User 1 - a13750791 - Paulo
+User 2 - a4818232 - Amanda
+User 3 -  a12682435 - Darlam
 
 */
 
@@ -44,17 +44,23 @@ REVOKE SELECT ON ESTRELA FROM a4818232;
 
 -- v.
 select * from a13750791.ESTRELA;
-
+/*
 ORA-00942: a tabela ou view não existe
 00942. 00000 -  "table or view does not exist"
 *Cause:    
 *Action:
 Erro na linha: 5 Coluna: 25
-
+*/
 
 
 --b)
-GRANT SELECT ON ESTRELA TO a4818232 WITH GRANT OPTION; -- não executado
+GRANT SELECT ON ESTRELA TO a4818232 WITH GRANT OPTION;
+
+-- i.
+select * from a13750791.ESTRELA;
+-- Busca executada com sucesso
+
+-- ii.
 
 
 
