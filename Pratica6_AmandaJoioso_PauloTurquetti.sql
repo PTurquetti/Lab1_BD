@@ -32,6 +32,19 @@ INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z) 
 -- Erro de SQL: ORA-01031: privilégios insuficientes
 
 
+-- iii.
+-- precis de usa=er 3
+
+
+
+-- iv.
+-- Removendo privilerio de user 2
+REVOKE SELECT ON ESTRELA FROM a4818232;
+
+
+-- v.
+
+
 
 
 
