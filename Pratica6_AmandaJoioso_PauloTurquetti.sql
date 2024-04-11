@@ -109,6 +109,14 @@ INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('654321', 'Alp
 
 -- 1 linha inserido.
 
+-- b)
+-- User 1 fazendo busca:
+SELECT * FROM ESTRELA WHERE ID_ESTRELA = '654321';
+-- Nenhuma tupla corresponde
+
+-- User 2 fazendo busca
+
+
 
 
 
