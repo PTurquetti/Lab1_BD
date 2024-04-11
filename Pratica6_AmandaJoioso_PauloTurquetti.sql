@@ -110,11 +110,34 @@ INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('654321', 'Alp
 -- 1 linha inserido.
 
 -- b)
+
+-- Antes do commit:
 -- User 1 fazendo busca:
 SELECT * FROM ESTRELA WHERE ID_ESTRELA = '654321';
--- Nenhuma tupla corresponde
+-- Nenhuma tupla corresponde foi encontrada
 
 -- User 2 fazendo busca
+SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '654321';
+-- A tupla foi encontrada
+
+
+
+-- Depois do commit:
+-- User 1 fazendo busca:
+SELECT * FROM ESTRELA WHERE ID_ESTRELA = '654321';
+-- A tupla foi encontrada
+
+
+-- User 2 fazendo busca
+SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '654321';
+-- A tupla foi encontrada
+
+/* EXPLICAR
+
+*/
+
+
+
 
 
 
