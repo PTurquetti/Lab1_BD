@@ -32,6 +32,15 @@ INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUE
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Autem beatae.', '21    Mon', 100, 200, 687);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Autem beatae.', 'GJ 3579', 100, 200, 687);
 
+-- Inserindo dados na tabela PLANETA
+INSERT INTO planeta (id_astro,massa,raio,classificacao) VALUES ('Tatooine',58431.15,25999.94,'Modi eos quisquam officiis ratione iure.');
+
+-- Inserindo dados na tabela ESPECIE
+INSERT INTO especie (nome,planeta_or,inteligente) VALUES ('Humano','Tatooine','V');
+
+-- Inserindo dados na tabela FEDERACAO
+INSERT INTO federacao (nome,data_fund) VALUES ('Lado Negro',TO_DATE('1976-10-21 00:00:00', 'YYYY-MM-DD HH24:MI:SS')); 
+
 
 -- QUESTAO 1 -------------------------------------------------------------------------------------------------------------
 
@@ -168,7 +177,8 @@ view não preserva essas chaves primárias porque uma única linha na view pode 
 devido ao JOIN, o que pode ser percebido claramente na falha em tentar fazer um insert ou update. Já no caso do delete, ele
 funcionou e excluiu a tupla correspondente da tabela ORBITA_PLANETA, o delete, diferente do insert e do update, funcionou
 pois  a operação de delete pode ser mapeada de forma única para uma operação de delete em uma das tabelas base. Nesse caso,
-a tabela que aparece primeiro na lista FROM do comando CREATE VIEW, que é a tabela ORBITA_PLANETA. */
+a tabela que aparece primeiro na lista FROM do comando CREATE VIEW, que é a tabela ORBITA_PLANETA. Assim, a view não é completamente
+atualizável. */
 
 -- b)
 
@@ -182,10 +192,38 @@ o nome da estrela (NOME_ESTRELA). O resultado é a quantidade de planetas que or
 item anterior).
 */
 
+-- QUESTAO 4 -------------------------------------------------------------------------------------------------------------
 
+/* A view VIEW_LIDER seleciona o CPI, o nome, cargo, nação, espécie e planeta do líder,
+combinando dados das tabelas LIDER, NACAO e ESPECIE por meio de joins. */
 
+CREATE VIEW VIEW_LIDER AS
+SELECT L.CPI, L.NOME, L.CARGO, L.NACAO, N.FEDERACAO, L.ESPECIE, E.PLANETA_OR
+FROM LIDER L
+JOIN NACAO N ON L.NACAO = N.NOME
+JOIN ESPECIE E ON L.ESPECIE = E.NOME;
 
+-- a)
+/* A view VIEW_LIDER é baseada em um JOIN de três tabelas (LIDER, NACAO e ESPECIE). Cada uma 
+dessas tabelas tem sua própria chave primária (CPI para LIDER, NOME para NACAO e NOME para ESPECIE). 
+No entanto, a view não preserva essas chaves primárias porque uma única linha na view pode corresponder
+a várias linhas nas tabelas base devido ao JOIN. Portanto, a view não é atualizável para operações de 
+INSERT e UPDATE. No entanto, a operação de DELETE pode ser bem-sucedida se o banco de dados puder identificar
+de forma única o registro a ser excluído nas tabelas base.*/
 
+-- b)
+
+INSERT INTO VIEW_LIDER (CPI, NOME, CARGO, NACAO, FEDERACAO, ESPECIE, PLANETA_OR)
+VALUES ('444.444.444-44', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Lado Negro', 'Humano', 'Tatooine');
+
+-- Erro de SQL: ORA-01776: não é possível modificar mais de uma vez uma tabela de base através da view de junção
+/* 
+A view VIEW_LIDER é baseada em um JOIN de três tabelas (LIDER, NACAO e ESPECIE). Quando tentamos inserir um novo registro na view,
+foi obtido um erro diferente da questão anterior, agora ao invés de acusar que não foram preservadas as chaves da tabela base, ele
+acusa que não é possível modificar mais de uma tabela de base através da view. O banco de dados precisa saber em qual tabela base
+o novo registro deve ser inserido. No entanto, a instrução INSERT criada tenta inserir valores que pertencem a mais de uma tabela 
+base (LIDER, NACAO e ESPECIE), o que causa o erro.
+*/
 
 
 
