@@ -32,16 +32,6 @@ INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUE
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Autem beatae.', '21    Mon', 100, 200, 687);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Autem beatae.', 'GJ 3579', 100, 200, 687);
 
--- Inserindo dados na tabela PLANETA
-INSERT INTO planeta (id_astro,massa,raio,classificacao) VALUES ('Tatooine',58431.15,25999.94,'Modi eos quisquam officiis ratione iure.');
-
--- Inserindo dados na tabela ESPECIE
-INSERT INTO especie (nome,planeta_or,inteligente) VALUES ('Humano','Tatooine','V');
-
--- Inserindo dados na tabela FEDERACAO
-INSERT INTO federacao (nome,data_fund) VALUES ('Lado Negro',TO_DATE('1976-10-21 00:00:00', 'YYYY-MM-DD HH24:MI:SS')); 
-
-
 -- QUESTAO 1 -------------------------------------------------------------------------------------------------------------
 
 -- 1)
@@ -206,10 +196,9 @@ JOIN ESPECIE E ON L.ESPECIE = E.NOME;
 -- a)
 /* A view VIEW_LIDER é baseada em um JOIN de três tabelas (LIDER, NACAO e ESPECIE). Cada uma 
 dessas tabelas tem sua própria chave primária (CPI para LIDER, NOME para NACAO e NOME para ESPECIE). 
-No entanto, a view não preserva essas chaves primárias porque uma única linha na view pode corresponder
-a várias linhas nas tabelas base devido ao JOIN. Portanto, a view não é atualizável para operações de 
-INSERT e UPDATE. No entanto, a operação de DELETE pode ser bem-sucedida se o banco de dados puder identificar
-de forma única o registro a ser excluído nas tabelas base.*/
+A view preserva essas chaves primárias e portanto, a view é atualizável para operações de 
+INSERT, UPDATE e DELETE.
+*/
 
 -- b)
 
@@ -225,17 +214,118 @@ o novo registro deve ser inserido. No entanto, a instrução INSERT criada tenta
 base (LIDER, NACAO e ESPECIE), o que causa o erro.
 */
 
+/* Entretanto, se dividimos os inserts, como feito abaixo, funciona normalmente. Percebemos que dividindo os inserts de forma que
+quando atualizamos a view agora estamos apenas inserindo dados da tabela LIDER e não das três tabelas base ao mesmo tempo. Dessa forma
+o resultado de SELECT * FROM VIEW_LIDER mostra o novo lider adicionado e, a partir dos JOINS entre as tabelas, os dados que ficaram de fora
+do insert direto na view puderam ser adicionados a tabela normalmente. Isso foi possível pois para a criação dessa view as chaves foram
+preservadas.*/
 
+INSERT INTO planeta (id_astro,massa,raio,classificacao) VALUES ('Tatooine',58431.15,25999.94,'Modi eos quisquam officiis ratione iure.');
+INSERT INTO especie (nome,planeta_or,inteligente) VALUES ('Humano','Tatooine','V');
+INSERT INTO federacao (nome,data_fund) VALUES ('Lado Negro',TO_DATE('1976-10-21 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+INSERT INTO nacao (NOME, FEDERACAO) VALUES ('Mustafar', 'Lado Negro');
 
+INSERT INTO VIEW_LIDER (CPI, NOME, CARGO, NACAO, ESPECIE)
+VALUES ('444.444.444-44', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Humano');
 
+/* 
+CPI            | NOME           | CARGO    | NACAO        | FEDERACAO        | ESPECIE    | PLANETA_OR
+444.444.444-44	Anakin Sky.	    COMANDANTE	Mustafar	    Lado Negro	    Humano	        Tatooine
+111.111.111-11	Capitã Aria No	CIENTISTA 	Quam quia ad.	Cum eum ex.	    Quidem quam	    HATS-8 b
+222.222.222-22	General Zorg	COMANDANTE	Veniam est.	    Quo est amet.	Unde eius at	In vero.
+333.333.333-33	Buzz Lightyear	OFICIAL   	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
 
+As colunas FEDERACAO e PLANETA_OR foram adicionadas pelo JOIN a partir dos dados que adicionamos lidando apenas com os atributos da
+tabela LIDER na VIEW_LIDER
+*/
 
+-- Com a chave preservada, conseguimos fazer o update e o delete normalmente também
 
+UPDATE VIEW_LIDER
+SET NOME = 'Darth Vader'
+WHERE CPI = '444.444.444-44';
 
+/* 
+CPI            | NOME           | CARGO    | NACAO        | FEDERACAO        | ESPECIE    | PLANETA_OR
+444.444.444-44	Darth Vader	    COMANDANTE	Mustafar	    Lado Negro	    Humano	        Tatooine
+111.111.111-11	Capitã Aria No	CIENTISTA 	Quam quia ad.	Cum eum ex.	    Quidem quam	    HATS-8 b
+222.222.222-22	General Zorg	COMANDANTE	Veniam est.	    Quo est amet.	Unde eius at	In vero.
+333.333.333-33	Buzz Lightyear	OFICIAL   	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+*/
 
+DELETE FROM VIEW_LIDER WHERE CPI = '444.444.444-44';
 
+/* 
+CPI            | NOME           | CARGO    | NACAO        | FEDERACAO        | ESPECIE    | PLANETA_OR
+111.111.111-11	Capitã Aria No	CIENTISTA 	Quam quia ad.	Cum eum ex.	    Quidem quam	    HATS-8 b
+222.222.222-22	General Zorg	COMANDANTE	Veniam est.	    Quo est amet.	Unde eius at	In vero.
+333.333.333-33	Buzz Lightyear	OFICIAL   	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+*/
 
+-- QUESTAO 5 -------------------------------------------------------------------------------------------------------------
 
+/* A view VIEW_FACCAO seleciona o nome e ideologia da faccao, assim como o CPI e nome do seu líder,
+combinando dados das tabelas LIDER, NACAO e ESPECIE por meio de joins.*/
+
+CREATE VIEW VIEW_FACCAO AS
+SELECT F.NOME AS NOME_FACCAO, F.LIDER AS CPI_LIDER, L.NOME AS NOME_LIDER, F.IDEOLOGIA
+FROM FACCAO F
+JOIN LIDER L ON F.LIDER = L.CPI;
+
+-- a)
+-- Inserindo os dados deletados anteriormente para fazer os testes
+INSERT INTO VIEW_LIDER (CPI, NOME, CARGO, NACAO, ESPECIE)
+VALUES ('444.444.444-44', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Humano');
+
+UPDATE VIEW_LIDER
+SET NOME = 'Darth Vader'
+WHERE CPI = '444.444.444-44';
+
+/* 
+Assim como no exercício anterior, recebemos o seguinte erro ao tentar fazer o inset abaixo:
+Erro de SQL: ORA-01776: não é possível modificar mais de uma vez uma tabela de base através da view de junção
+*/
+INSERT INTO VIEW_FACCAO (NOME_FACCAO, CPI_LIDER, NOME_LIDER, IDEOLOGIA) VALUES ('Lado Negro', '444.444.444-44', 'Darth Vader', 'TRADICIONALISTA');
+
+-- Dessa forma, vamos testar dividir esse insert de forma que lidamos apenas com a tabela FACCAO e os outros dados são obtidos através do JOIN:
+
+INSERT INTO VIEW_FACCAO(NOME_FACCAO, CPI_LIDER, IDEOLOGIA) VALUES ('Lado Negro', '444.444.444-44', 'TRADICIONALISTA');
+
+/*
+NOME_FACCAO    | CPI_LIDER        | NOME_LIDER    | IDEOLOGIA
+Prog Celestiais	111.111.111-11	    Capitã Aria No	PROGRESSITA
+Cons Cósmicos	222.222.222-22	    General Zorg	TRADICIONALISTA
+Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
+Lado Negro	    444.444.444-44	    Darth Vader	    TRADICIONALISTA
+
+Dessa forma, pudemos fazer a inserção normalmente, pois as chaves foram preservadas e agora lidamos com apenas uma tabela por vez para
+realizar o insert.
+*/
+
+UPDATE VIEW_FACCAO
+SET NOME_FACCAO = 'Galactic Empire'
+WHERE NOME_FACCAO = 'Lado Negro';
+
+/*
+NOME_FACCAO    | CPI_LIDER        | NOME_LIDER    | IDEOLOGIA
+Prog Celestiais	111.111.111-11	    Capitã Aria No	PROGRESSITA
+Cons Cósmicos	222.222.222-22	    General Zorg	TRADICIONALISTA
+Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
+Galatic Empire	444.444.444-44	    Darth Vader	    TRADICIONALISTA
+*/
+
+DELETE FROM VIEW_FACCAO WHERE NOME_FACCAO = 'Galactic Empire';
+
+/*
+NOME_FACCAO    | CPI_LIDER        | NOME_LIDER    | IDEOLOGIA
+Prog Celestiais	111.111.111-11	    Capitã Aria No	PROGRESSITA
+Cons Cósmicos	222.222.222-22	    General Zorg	TRADICIONALISTA
+Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
+*/
+
+/* A view VIEW_FACCAO tambem é atualizavel, o que pode ser visto atraves dos testes e se deve à preservação de chaves*/
+
+-- QUESTAO 6 -------------------------------------------------------------------------------------------------------------
 
 
 
