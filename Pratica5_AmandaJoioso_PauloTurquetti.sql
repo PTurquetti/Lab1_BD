@@ -359,7 +359,8 @@ ALTER MATERIALIZED VIEW LOG ON NACAO_FACCAO
 
 /* 
 A visão MV_JUNCAO serve para contar quantas nações estão associadas a cada facção, o que pode ser útil para entender a
-distribuição de poder entre as facções com base no número de nações sob sua influência.
+distribuição de poder entre as facções com base no número de nações sob sua influência. Foi feita com junção para combinar
+informações das tabelas NACAO, NACAO_FACCAO e FACCAO.
 */
 
 CREATE MATERIALIZED VIEW MV_JUNCAO
@@ -383,6 +384,31 @@ intervenção manual, o que é importante para garantir que as análises feitas 
 
 -- VISAO MATERIALIZADA COM AGREGACAO --------------------------------
 
+/* 
+ Essa visão materializada fornece o número de nações agrupadas por federação, a agregação foi  usada para calcular o número de nações em
+cada federação, agregando os dados da tabela NACAO por FEDERACAO.
+*/
 
+CREATE MATERIALIZED VIEW mv_agregacao
+BUILD DEFERRED
+REFRESH COMPLETE ON DEMAND
+AS
+SELECT N.FEDERACAO, COUNT(*) AS QTD_NACOES
+FROM NACAO N
+GROUP BY N.FEDERACAO;
+/* 
+A visão não é populada imediatamente após a criação, por conta do BUILD DEFERRED, mas somente quando explicitamente invocada, foi usado esse parâmetro, pois
+a visão pode não ser usada com frequência e a construção inicial da visão materializada pode ser custosa em termos de recursos do sistema.. O refresh completo
+da visão é feito somente sob demanda, o que é útil nessa visão já que os dados podem não mudar com frequência e não precisam ser atualizados em tempo real.
+*/
 
+/* 
+Como a visão materializada tem o refresh definido como "COMPLETE ON DEMAND", ela não será atualizada automaticamente. É preciso solicitar 
+manualmente a atualização dos dados. 
+*/
+BEGIN
+    DBMS_MVIEW.REFRESH('mv_agregacao');
+END;
+
+-- VISAO MATERIALIZADA ANINHADA --------------------------------
 
