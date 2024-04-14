@@ -25,6 +25,9 @@ INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Prog e Além', 
 INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Quam quia ad.', 'Prog Celestiais');
 INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Veniam est.', 'Cons Cósmicos');
 INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Modi porro ut.', 'Prog e Além');
+INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Vel rerum unde.', 'Prog Celestiais');
+INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Ducimus odio.', 'Prog Celestiais');
+INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Veniam est.', 'Prog e Além');
 
 -- Inserindo dados na tabela ORBITAPLANETA
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Eum iure animi.', 'Gl 539', 50, 100, 365);
@@ -326,6 +329,45 @@ Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
 /* A view VIEW_FACCAO tambem é atualizavel, o que pode ser visto atraves dos testes e se deve à preservação de chaves*/
 
 -- QUESTAO 6 -------------------------------------------------------------------------------------------------------------
+
+-- VISAO MATERIALIZADA COM JUNCAO --------------------------------
+/* 
+Primeiro, foi necessário criar um log de visão materializada na tabela NACAO_FACCAO, para que o Oracle possa rastrear
+as alterações nesta tabela e aplicá-las de forma eficiente na visão materializada.
+*/
+-- Criando o log de visão materializada para a tabela NACAO_FACCAO
+CREATE MATERIALIZED VIEW LOG ON NACAO_FACCAO WITH ROWID;
+/* 
+Em seguida, adicionamos as colunas NACAO e FACCAO ao log de visão materializada, incluindo a captura de novos valores,
+o que permite que o Oracle registre quaisquer novas inserções ou atualizações nessas colunas na tabela NACAO_FACCAO.
+*/
+-- Adicionar a captura de novos valores ao log de visão materializada na tabela NACAO_FACCAO
+ALTER MATERIALIZED VIEW LOG ON NACAO_FACCAO
+  ADD (NACAO, FACCAO) INCLUDING NEW VALUES;
+
+/* 
+A visão MV_JUNCAO serve para contar quantas nações estão associadas a cada facção, o que pode ser útil para entender a
+distribuição de poder entre as facções com base no número de nações sob sua influência.
+*/
+
+CREATE MATERIALIZED VIEW MV_JUNCAO
+BUILD IMMEDIATE
+REFRESH FAST ON COMMIT
+AS
+SELECT F.NOME AS FACCAO, COUNT(*) AS QTD_NACOES
+FROM FACCAO F
+JOIN NACAO_FACCAO NF ON F.NOME = NF.FACCAO
+GROUP BY F.NOME;
+
+/*
+A visão foi criada com BUILD IMMEDIATE, o que significa que ela foi populada imediatamente após sua criação. Utilizamos isso nessa visão,
+pois queremos que ela esteja disponível para consulta imediatamente após sua criação.
+
+Além disso, a visão foi configurada para ser atualizada com REFRESH FAST ON COMMIT, que indica ao Oracle que a visão deve ser atualizada de
+forma rápida e eficiente após cada operação de commit no banco de dados. Dado que a tabela NACAO_FACCAO pode ser frequentemente atualizada, 
+essa configuração garante que a visão seja mantida atualizada com as alterações mais recentes de forma automatizada, sem a necessidade de 
+intervenção manual, o que é importante para garantir que as análises feitas com base na visão reflitam sempre os dados mais recentes disponíveis.
+*/
 
 
 
