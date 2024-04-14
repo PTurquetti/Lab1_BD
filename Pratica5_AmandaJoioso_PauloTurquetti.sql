@@ -35,6 +35,27 @@ INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUE
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Autem beatae.', '21    Mon', 100, 200, 687);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Autem beatae.', 'GJ 3579', 100, 200, 687);
 
+-- Inserindo dados na tabela ESPECIE
+INSERT INTO ESPECIE(NOME, PLANETA_OR, INTELIGENTE) VALUES ('Mandaloriano', 'Tatooine', 'V');
+
+-- Inserindo dados na tabela COMUNIDADE
+INSERT INTO COMUNIDADE(ESPECIE, NOME, QTD_HABITANTES) VALUES ('Humano', 'Ordem Jedi', 10000);
+INSERT INTO COMUNIDADE(ESPECIE, NOME, QTD_HABITANTES) VALUES ('Humano', 'Lado Sombrio', 5000000);
+INSERT INTO COMUNIDADE(ESPECIE, NOME, QTD_HABITANTES) VALUES ('Mandaloriano', 'Mandalorian', 15000);
+
+-- Inserindo dados na tabela PARTICIPA
+INSERT INTO PARTICIPA(FACCAO, ESPECIE, COMUNIDADE) VALUES ('Prog Celestiais', 'Humano', 'Ordem Jedi');
+INSERT INTO PARTICIPA(FACCAO, ESPECIE, COMUNIDADE) VALUES ('Galactic Empire', 'Humano', 'Lado Sombrio');
+INSERT INTO PARTICIPA(FACCAO, ESPECIE, COMUNIDADE) VALUES ('Galactic Empire', 'Mandaloriano', 'Mandalorian');
+
+-- Inserindo dados na tabela HABITACAO
+INSERT INTO HABITACAO(PLANETA, ESPECIE, COMUNIDADE, DATA_INI) VALUES ('Tatooine', 'Humano', 'Ordem Jedi', TO_DATE('2021-10-28 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+INSERT INTO HABITACAO(PLANETA, ESPECIE, COMUNIDADE, DATA_INI) VALUES ('Tatooine', 'Humano', 'Lado Sombrio', TO_DATE('2021-10-29 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+INSERT INTO HABITACAO(PLANETA, ESPECIE, COMUNIDADE, DATA_INI) VALUES ('Tatooine', 'Mandaloriano', 'Mandalorian', TO_DATE('2021-10-30 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+
+
+
 -- QUESTAO 1 -------------------------------------------------------------------------------------------------------------
 
 -- 1)
@@ -412,3 +433,28 @@ END;
 
 -- VISAO MATERIALIZADA ANINHADA --------------------------------
 
+/* 
+Nessa visão, contamos o número de habitantes por facção em cada planeta. A razão para o aninhamento é que precisamos primeiro identificar as
+comunidades associadas a cada facção em cada planeta antes de calcular a contagem de habitantes.
+*/
+CREATE MATERIALIZED VIEW mv_aninhada
+BUILD IMMEDIATE
+REFRESH COMPLETE ON DEMAND
+AS
+SELECT NOME_PLANETA, NOME_FACCAO, SUM(QTD_HABITANTES) AS QTD_TOTAL_HABITANTES
+FROM (
+    SELECT H.PLANETA AS NOME_PLANETA, P.FACCAO AS NOME_FACCAO, C.QTD_HABITANTES
+    FROM HABITACAO H
+    JOIN PARTICIPA P ON H.ESPECIE = P.ESPECIE AND H.COMUNIDADE = P.COMUNIDADE
+    JOIN COMUNIDADE C ON H.ESPECIE = C.ESPECIE AND H.COMUNIDADE = C.NOME
+)
+GROUP BY NOME_PLANETA, NOME_FACCAO;
+
+/*
+Foi usado BUILD IMMEDIATE, pois especifica que a visão materializada será populada imediatamente após sua criação, como essa view envolve uma consulta
+relativamente simples e direta às tabelas base, não há necessidade de adiar a construção da visão. Já o REFRESH COMPLETE ON DEMAND foi usado, pois indica 
+que a visão será completamente atualizada sob demanda, quando explicitamente solicitado pelo usuário ou administrador do banco de dados, pois como a visão 
+está calculando o número total de habitantes por facção em cada planeta, uma atualização completa é apropriada para garantir que os dados estejam sempre 
+corretos e atualizados, mas como a atualização completa pode ser uma operação intensiva em termos de recursos, realizar essa operação sob demanda permite um
+controle maior sobre quando ela ocorre, o que pode resultar na melhor utilização dos recursos do sistema.
+*/
