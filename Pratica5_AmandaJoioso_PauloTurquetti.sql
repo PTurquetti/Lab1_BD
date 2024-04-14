@@ -10,9 +10,9 @@ Paulo Henrique Vedovatto Turquetti - 13750791
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('111.111.111-11', 'Capitã Aria No', 'CIENTISTA', 'Quam quia ad.', 'Quidem quam');
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('222.222.222-22', 'General Zorg', 'COMANDANTE', 'Veniam est.', 'Unde eius at');
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('333.333.333-33', 'Buzz Lightyear', 'OFICIAL', 'Modi porro ut.', 'Iure sunt quas');
-INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('444.444.444-44', 'Darth Vader', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('444.444.444-44', 'Palpatine', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('555.555.555-55', 'Luke Sky', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
-INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('666.666.666-66', 'Spok', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('666.666.666-66', 'Spock', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
 INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('777.777.777-77', 'Groot', 'COMANDANTE', 'Modi porro ut.', 'Iure sunt quas');
 
 
@@ -106,7 +106,7 @@ CREATE OR REPLACE VIEW VIEW_FACCAO_3 AS
 WITH CHECK OPTION;
 
 -- Inserindo uma faccao tradicionalista na view:
-INSERT INTO VIEW_FACCAO_3 VALUES ('StarTrack', '666.666.666-66', 'TRADICIONALISTA');
+INSERT INTO VIEW_FACCAO_3 VALUES ('Star Trek', '666.666.666-66', 'TRADICIONALISTA');
 -- INSERIDO COM SUCESSO
 
 -- Inserindo uma faccao tradicionalista na view:
@@ -122,12 +122,12 @@ Cons Cósmicos	222.222.222-22	TRADICIONALISTA
 Prog e Além	333.333.333-33	PROGRESSITA	
 Uspianos	444.444.444-44	TRADICIONALISTA	
 Jedis do Bem	555.555.555-55	PROGRESSITA	
-StarTrack	666.666.666-66	TRADICIONALISTA	
+Star Trek	666.666.666-66	TRADICIONALISTA	
 
 Tabela VIEQ_FACCAO_3
 Cons Cósmicos	222.222.222-22	TRADICIONALISTA
 Uspianos	444.444.444-44	TRADICIONALISTA
-StarTrack	666.666.666-66	TRADICIONALISTA
+Star Trek	666.666.666-66	TRADICIONALISTA
 
 Podemos ver que tanto na tabela FACCAO quanto na nossa view foi inserido somente a tupla referente à facção tradicionalista
 
@@ -206,7 +206,7 @@ INSERT, UPDATE e DELETE.
 -- b)
 
 INSERT INTO VIEW_LIDER (CPI, NOME, CARGO, NACAO, FEDERACAO, ESPECIE, PLANETA_OR)
-VALUES ('444.444.444-44', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Lado Negro', 'Humano', 'Tatooine');
+VALUES ('888.888.888-88', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Lado Negro', 'Humano', 'Tatooine');
 
 -- Erro de SQL: ORA-01776: não é possível modificar mais de uma vez uma tabela de base através da view de junção
 /* 
@@ -229,14 +229,18 @@ INSERT INTO federacao (nome,data_fund) VALUES ('Lado Negro',TO_DATE('1976-10-21 
 INSERT INTO nacao (NOME, FEDERACAO) VALUES ('Mustafar', 'Lado Negro');
 
 INSERT INTO VIEW_LIDER (CPI, NOME, CARGO, NACAO, ESPECIE)
-VALUES ('444.444.444-44', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Humano');
+VALUES ('888.888.888-88', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Humano');
 
 /* 
 CPI            | NOME           | CARGO    | NACAO        | FEDERACAO        | ESPECIE    | PLANETA_OR
-444.444.444-44	Anakin Sky.	    COMANDANTE	Mustafar	    Lado Negro	    Humano	        Tatooine
 111.111.111-11	Capitã Aria No	CIENTISTA 	Quam quia ad.	Cum eum ex.	    Quidem quam	    HATS-8 b
 222.222.222-22	General Zorg	COMANDANTE	Veniam est.	    Quo est amet.	Unde eius at	In vero.
 333.333.333-33	Buzz Lightyear	OFICIAL   	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+444.444.444-44	Palpatine	    COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+555.555.555-55	Luke Sky	    COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+666.666.666-66	Spock	        COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+777.777.777-77	Groot	        COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+888.888.888-88	Anakin Sky.	    COMANDANTE	Mustafar	    Lado Negro	    Humano	        Tatooine
 
 As colunas FEDERACAO e PLANETA_OR foram adicionadas pelo JOIN a partir dos dados que adicionamos lidando apenas com os atributos da
 tabela LIDER na VIEW_LIDER
@@ -246,23 +250,31 @@ tabela LIDER na VIEW_LIDER
 
 UPDATE VIEW_LIDER
 SET NOME = 'Darth Vader'
-WHERE CPI = '444.444.444-44';
+WHERE CPI = '888.888.888-88';
 
 /* 
 CPI            | NOME           | CARGO    | NACAO        | FEDERACAO        | ESPECIE    | PLANETA_OR
-444.444.444-44	Darth Vader	    COMANDANTE	Mustafar	    Lado Negro	    Humano	        Tatooine
 111.111.111-11	Capitã Aria No	CIENTISTA 	Quam quia ad.	Cum eum ex.	    Quidem quam	    HATS-8 b
 222.222.222-22	General Zorg	COMANDANTE	Veniam est.	    Quo est amet.	Unde eius at	In vero.
 333.333.333-33	Buzz Lightyear	OFICIAL   	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+444.444.444-44	Palpatine	    COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+555.555.555-55	Luke Sky	    COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+666.666.666-66	Spock	        COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+777.777.777-77	Groot	        COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+888.888.888-88	Darth Vader	    COMANDANTE	Mustafar	    Lado Negro	    Humano	        Tatooine
 */
 
-DELETE FROM VIEW_LIDER WHERE CPI = '444.444.444-44';
+DELETE FROM VIEW_LIDER WHERE CPI = '888.888.888-88';
 
 /* 
 CPI            | NOME           | CARGO    | NACAO        | FEDERACAO        | ESPECIE    | PLANETA_OR
 111.111.111-11	Capitã Aria No	CIENTISTA 	Quam quia ad.	Cum eum ex.	    Quidem quam	    HATS-8 b
 222.222.222-22	General Zorg	COMANDANTE	Veniam est.	    Quo est amet.	Unde eius at	In vero.
 333.333.333-33	Buzz Lightyear	OFICIAL   	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+444.444.444-44	Palpatine	    COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+555.555.555-55	Luke Sky	    COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+666.666.666-66	Spock	        COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
+777.777.777-77	Groot	        COMANDANTE	Modi porro ut.	Sunt fuga ex.	Iure sunt quas	Est ab in.
 */
 
 -- QUESTAO 5 -------------------------------------------------------------------------------------------------------------
@@ -278,28 +290,28 @@ JOIN LIDER L ON F.LIDER = L.CPI;
 -- a)
 -- Inserindo os dados deletados anteriormente para fazer os testes
 INSERT INTO VIEW_LIDER (CPI, NOME, CARGO, NACAO, ESPECIE)
-VALUES ('444.444.444-44', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Humano');
+VALUES ('888.888.888-88', 'Anakin Sky.', 'COMANDANTE', 'Mustafar', 'Humano');
 
 UPDATE VIEW_LIDER
 SET NOME = 'Darth Vader'
-WHERE CPI = '444.444.444-44';
+WHERE CPI = '888.888.888-88';
 
 /* 
 Assim como no exercício anterior, recebemos o seguinte erro ao tentar fazer o inset abaixo:
 Erro de SQL: ORA-01776: não é possível modificar mais de uma vez uma tabela de base através da view de junção
 */
-INSERT INTO VIEW_FACCAO (NOME_FACCAO, CPI_LIDER, NOME_LIDER, IDEOLOGIA) VALUES ('Lado Negro', '444.444.444-44', 'Darth Vader', 'TRADICIONALISTA');
+INSERT INTO VIEW_FACCAO (NOME_FACCAO, CPI_LIDER, NOME_LIDER, IDEOLOGIA) VALUES ('Lado Negro', '888.888.888-88', 'Darth Vader', 'TRADICIONALISTA');
 
 -- Dessa forma, vamos testar dividir esse insert de forma que lidamos apenas com a tabela FACCAO e os outros dados são obtidos através do JOIN:
 
-INSERT INTO VIEW_FACCAO(NOME_FACCAO, CPI_LIDER, IDEOLOGIA) VALUES ('Lado Negro', '444.444.444-44', 'TRADICIONALISTA');
+INSERT INTO VIEW_FACCAO(NOME_FACCAO, CPI_LIDER, IDEOLOGIA) VALUES ('Lado Negro', '888.888.888-88', 'TRADICIONALISTA');
 
 /*
 NOME_FACCAO    | CPI_LIDER        | NOME_LIDER    | IDEOLOGIA
-Prog Celestiais	111.111.111-11	    Capitã Aria No	PROGRESSITA
-Cons Cósmicos	222.222.222-22	    General Zorg	TRADICIONALISTA
-Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
-Lado Negro	    444.444.444-44	    Darth Vader	    TRADICIONALISTA
+Prog Celestiais	111.111.111-11	Capitã Aria No	PROGRESSITA
+Cons Cósmicos	222.222.222-22	General Zorg	TRADICIONALISTA
+Prog e Além	    333.333.333-33	Buzz Lightyear	PROGRESSITA
+Lado Negro	    888.888.888-88	Darth Vader	    TRADICIONALISTA
 
 Dessa forma, pudemos fazer a inserção normalmente, pois as chaves foram preservadas e agora lidamos com apenas uma tabela por vez para
 realizar o insert.
@@ -311,19 +323,19 @@ WHERE NOME_FACCAO = 'Lado Negro';
 
 /*
 NOME_FACCAO    | CPI_LIDER        | NOME_LIDER    | IDEOLOGIA
-Prog Celestiais	111.111.111-11	    Capitã Aria No	PROGRESSITA
-Cons Cósmicos	222.222.222-22	    General Zorg	TRADICIONALISTA
-Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
-Galatic Empire	444.444.444-44	    Darth Vader	    TRADICIONALISTA
+Prog Celestiais	111.111.111-11	Capitã Aria No	PROGRESSITA
+Cons Cósmicos	222.222.222-22	General Zorg	TRADICIONALISTA
+Prog e Além	    333.333.333-33	Buzz Lightyear	PROGRESSITA
+Galactic Empire	888.888.888-88	Darth Vader	    TRADICIONALISTA
 */
 
 DELETE FROM VIEW_FACCAO WHERE NOME_FACCAO = 'Galactic Empire';
 
 /*
 NOME_FACCAO    | CPI_LIDER        | NOME_LIDER    | IDEOLOGIA
-Prog Celestiais	111.111.111-11	    Capitã Aria No	PROGRESSITA
-Cons Cósmicos	222.222.222-22	    General Zorg	TRADICIONALISTA
-Prog e Além	    333.333.333-33	    Buzz Lightyear	PROGRESSITA
+Prog Celestiais	111.111.111-11	Capitã Aria No	PROGRESSITA
+Cons Cósmicos	222.222.222-22	General Zorg	TRADICIONALISTA
+Prog e Além	    333.333.333-33	Buzz Lightyear	PROGRESSITA
 */
 
 /* A view VIEW_FACCAO tambem é atualizavel, o que pode ser visto atraves dos testes e se deve à preservação de chaves*/
