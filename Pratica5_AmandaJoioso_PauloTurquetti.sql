@@ -381,6 +381,8 @@ essa configuração garante que a visão seja mantida atualizada com as alteraç
 intervenção manual, o que é importante para garantir que as análises feitas com base na visão reflitam sempre os dados mais recentes disponíveis.
 */
 
+-- VISAO MATERIALIZADA COM AGREGACAO --------------------------------
+
 
 
 
