@@ -153,10 +153,11 @@ REVOKE SELECT, INSERT ON ESTRELA FROM a4818232;
 
 -- QUESTÃO 3 ---------------------------------------------------------------------------------------------------------
 
--- User 1 concedeprivilegio de busca para user 2:
-GRANT SELECT ON COMUNIDADE TO a4818232;
 
--- User 2 cria a nova tabela
+-- a) User 1 DANDO PRIVILEGIO
+GRANT SELECT, REFERENCES(especie, nome) ON COMUNIDADE TO a4818232 WITH GRANT OPTION;
+
+-- b)
 
 
 
