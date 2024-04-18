@@ -170,6 +170,6 @@ CREATE TABLE CURIOSIDADES_COMUNIDADE(
 
 Os Jedi são treinados desde a infância, usam sabres de luz e têm uma conexão especial com a Força, guiando-se pelos ensinamentos do Código Jedi.
 
-
+Os Siths abraçam o lado sombrio da Força, buscam poder absoluto e seguem o Código Sith, desafiando os Jedi em busca de domínio galáctico.
 
 
