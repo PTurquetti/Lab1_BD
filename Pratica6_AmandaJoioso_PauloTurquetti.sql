@@ -309,6 +309,11 @@ Predicate Information (identified by operation id):
    1 - filter("INTELIGENTE"='V')
 */
 
+/*
+ Isso ocorre porque o índice criado pelo USER2 pode não ser reconhecido ou priorizado da mesma 
+forma que o índice existente no esquema do USER1, a menos que o otimizador seja explicitamente 
+instruído a priorizar os índices, como foi feito no caso de USER2.
+*/
 
 
 
