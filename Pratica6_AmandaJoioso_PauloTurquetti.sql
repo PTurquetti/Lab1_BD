@@ -204,8 +204,29 @@ GRANT SELECT, INDEX ON ESPECIE TO a4818232;
 create bitmap index idx_especie on a13750791.especie(inteligente);
 
 
+-- c)
+explain plan for
+select * from a13750791.especie where inteligente = 'V';
 
+SELECT plan_table_output
+FROM TABLE(dbms_xplan.display());
 
+/*
+Plan hash value: 139595281
+ 
+-----------------------------------------------------------------------------
+| Id  | Operation         | Name    | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------
+|   0 | SELECT STATEMENT  |         | 24940 |   706K|    70   (3)| 00:00:01 |
+|*  1 |  TABLE ACCESS FULL| ESPECIE | 24940 |   706K|    70   (3)| 00:00:01 |
+-----------------------------------------------------------------------------
+ 
+Predicate Information (identified by operation id):
+---------------------------------------------------
+ 
+   1 - filter("INTELIGENTE"='V')
+
+*/
 
 
 
