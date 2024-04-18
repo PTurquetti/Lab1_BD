@@ -316,7 +316,14 @@ instruído a priorizar os índices, como foi feito no caso de USER2.
 */
 
 
+-- QUESTÃO 5 -------------------------------------------------------------------------------------------
 
+-- User 1 garantindo privilegios para user 2:
+GRANT SELECT ON FACCAO TO a4818232;
+GRANT SELECT ON LIDER TO a4818232;
+
+
+-- User 2 criando view em cima das tabelas de User 1:
 
 
 
