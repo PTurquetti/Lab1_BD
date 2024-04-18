@@ -189,3 +189,37 @@ Não foi possível inserir essa tupla já que foi tentado referenciar uma comuni
 DELETE FROM a13750791.COMUNIDADE WHERE NOME = 'Ordem Jedi'
 Relatório de erros -
 ORA-02292: restrição de integridade (A13750791.FK_HABITACAO_COMUNIDADE) violada - registro filho localizado*/
+
+
+
+
+-- QUESTÃO 4 -----------------------------------------------------------------------------------------------------------
+
+
+-- a)
+GRANT SELECT, INDEX ON ESPECIE TO a4818232;
+
+
+-- b)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
