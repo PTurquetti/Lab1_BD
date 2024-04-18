@@ -232,6 +232,9 @@ Predicate Information (identified by operation id):
 
 ALTER SESSION SET OPTIMIZER_MODE = FIRST_ROWS;
 
+
+-- f)
+
 explain plan for
 select * from a13750791.especie where inteligente = 'V';
 
