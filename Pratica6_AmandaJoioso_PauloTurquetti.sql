@@ -170,7 +170,9 @@ CREATE TABLE CURIOSIDADES_COMUNIDADE(
 
 -- c)
 -- inserindo na tabela curiosidade uma tupla referente a uma comunidade existente de user1:
+INSERT INTO CURIOSIDADES_COMUNIDADE(NOME_COMUNIDADE, ESPECIE_COMUNIDADE, CURIOSIDADE) VALUES('Ordem Jedi', 'Humano', 'Os Jedi são treinados desde a infância, usam sabres de luz e têm uma conexão especial com a Força, guiando-se pelos ensinamentos do Código Jedi.');
 
 -- inserindo na tabela curiosidade uma tupla referente a uma comunidade não existente:
+INSERT INTO CURIOSIDADES_COMUNIDADE(NOME_COMUNIDADE, ESPECIE_COMUNIDADE, CURIOSIDADE) VALUES('Sithans', 'Sith', 'Os Siths abraçam o lado sombrio da Força, buscam poder absoluto e seguem o Código Sith, desafiando os Jedi em busca de domínio galáctico.');
 
 
