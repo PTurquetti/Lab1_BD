@@ -201,8 +201,7 @@ GRANT SELECT, INDEX ON ESPECIE TO a4818232;
 
 
 -- b)
-
-
+create bitmap index idx_especie on a13750791.especie(inteligente);
 
 
 
