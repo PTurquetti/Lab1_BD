@@ -181,3 +181,11 @@ ORA-02291: restrição de integridade (A4818232.FK_CURIOSIDADES) violada - chave
 
 Não foi possível inserir essa tupla já que foi tentado referenciar uma comunidade que não existe na tabela COMUNIDADE do usuário 1
 */
+
+-- d)
+--DELETE FROM a13750791.COMUNIDADE WHERE NOME = 'Ordem Jedi';
+
+/*Erro a partir da linha : 15 no comando -
+DELETE FROM a13750791.COMUNIDADE WHERE NOME = 'Ordem Jedi'
+Relatório de erros -
+ORA-02292: restrição de integridade (A13750791.FK_HABITACAO_COMUNIDADE) violada - registro filho localizado*/
