@@ -177,4 +177,7 @@ INSERT INTO CURIOSIDADES_COMUNIDADE(NOME_COMUNIDADE, ESPECIE_COMUNIDADE, CURIOSI
 
 /*Relatório de erros -
 ORA-02291: restrição de integridade (A4818232.FK_CURIOSIDADES) violada - chave mãe não localizada
+
+
+Não foi possível inserir essa tupla já que foi tentado referenciar uma comunidade que não existe na tabela COMUNIDADE do usuário 1
 */
