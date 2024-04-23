@@ -64,45 +64,49 @@ ele recebeu um erro indicando que a tabela ou view não existe. Isso confirma qu
 
 --b)
 GRANT SELECT ON ESTRELA TO a4818232 WITH GRANT OPTION;
+/*Esse comando dá ao USER2 permissão de leitura (SELECT) na tabela ESTRELA do USER1 e, com a opção WITH GRANT OPTION,
+o USER2 pode conceder essa permissão a outros usuários.*/
 
 -- i.
 select * from a13750791.ESTRELA;
 -- Busca executada com sucesso
+/*O USER2 conseguiu realizar uma consulta na tabela ESTRELA do USER1, o que indica
+que a permissão de leitura foi concedida com sucesso.*/
 
 -- ii.
 GRANT SELECT ON ESTRELA TO a12682435;
 -- Grant bem-sucedido.
-
+/*O USER2 deu ao USER3 permissão de leitura (SELECT) na tabela ESTRELA do USER1, mas sem
+o GRANT OPTION, o USER3 não pode dar essa permissão a outros usuários.*/
 
 -- iii.
 -- User 3 tentando fazer consulta na tabela de user 1 sem ter permissão:
 SELECT * FROM a13750791.ESTRELA;
--- ORA-00942: a tabela ou view não existe
--- Isso ocorre porque o user 3 não recebeu nenhuma permissão à essa tabela de user 1
-
+-- Busca executada com sucesso
+/*O USER3 conseguiu realizar uma consulta na tabela ESTRELA do USER1, o que indica que
+a permissão de leitura foi concedida com sucesso.*/
 
 
 -- iv.
 REVOKE SELECT ON ESTRELA FROM a4818232;
 -- Revoke bem-sucedido.
-
+/*Esse comando tira a permissão de leitura (SELECT) do USER2 na tabela ESTRELA do USER1. 
+Como a permissão foi concedida com a opção GRANT OPTION, a permissão do USER3 também é revogada.*/
 
 
 -- v.
 -- user 2:
 select * from a13750791.ESTRELA;
-/*
-ORA-00942: a tabela ou view não existe
-00942. 00000 -  "table or view does not exist"
-*Cause:    
-*Action:
-Erro na linha: 5 Coluna: 25
-*/
+--ORA-00942: a tabela ou view não existe
+
+
 
 -- User 3:
+select * from a13750791.ESTRELA;
+--ORA-00942: a tabela ou view não existe
 
-
-
+/*Após a permissão de leitura ter sido retirada, quando foi tentado realizar a busca, ambos receberam um
+erro indicando que a tabela ou view não existe, o que confirma que a permissão de leitura foi retirada com sucesso.*/
 
 
 
@@ -114,16 +118,20 @@ REVOKE SELECT ON ESTRELA FROM a4818232
 
 -- Criando privilegio
 GRANT SELECT, INSERT (ID_ESTRELA, NOME, X, Y, Z) ON ESTRELA TO a4818232 WITH GRANT OPTION;
+/*Esse comando concede ao USER2 permissão de leitura (SELECT) e inserção (INSERT) em alguns atributos da tabela
+ESTRELA do USER1 e, com o GRANT OPTION, permite que o USER2 conceda essas permissões a outros usuários.*/
 
 
 -- a)
 
 INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('654321', 'Alpha Centauri A', 4.0, 5.0, 6.0);
-
 -- 1 linha inserido.
 
--- b)
+/*O USER2 conseguiu inserir uma tupla na tabela ESTRELA do USER1, o que indica 
+que a permissão de inserção foi concedida com sucesso.*/
 
+-- b)
+-- i.
 -- Antes do commit:
 -- User 1 fazendo busca:
 SELECT * FROM ESTRELA WHERE ID_ESTRELA = '654321';
@@ -145,14 +153,25 @@ SELECT * FROM ESTRELA WHERE ID_ESTRELA = '654321';
 SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '654321';
 -- A tupla foi encontrada
 
-/* EXPLICAR
-
+/* 
+Antes do commit, o USER1 não conseguiu encontrar a tupla inserida pelo USER2, pois a transação ainda não foi confirmada. 
+Já o USER2 conseguiu encontrar a tupla, pois a inserção já tinha sido realizada 'localmente'.
+Após o commit, tanto o USER1 quanto o USER2 conseguiram encontrar a tupla, pois a transação foi confirmada e se torna visível
+para todos os usuários que têm permissão para ver a tabela.
 */
+
+-- ii.
+/*Antes do commit, apenas o USER2 pode ver as alterações feitas na transação atual. Após o commit, todas as 
+alterações são permanentes e visíveis para todos os usuários que têm permissão para ver a tabela.*/
+
+-- iii.
+/*Os atributos para os quais o USER2 não tem permissão de inserção permanecem inalterados na tupla na tabela do USER1, com valores NULL no caso*/
 
 -- c)
 GRANT SELECT, INSERT (ID_ESTRELA, NOME, X, Y, Z) ON ESTRELA TO a12682435;
 -- Grant bem-sucedido.
-
+/*O USER2 concedeu ao USER3 as mesmas permissões que recebeu do USER1, mas sem o GRANT OPTION, 
+então o USER3 não poderá conceder essas permissões a outros usuários.*/
 
 -- d)
 -- Refazer item a e b com user 3
@@ -167,6 +186,8 @@ INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('654321', 'Alp
 -- e) 
 REVOKE SELECT, INSERT ON ESTRELA FROM a4818232;
 -- Revoke bem-sucedido.
+/*Esse comando retira as permissões de leitura (SELECT) e inserção (INSERT) do USER2 na tabela ESTRELA do USER1. 
+Como a permissão foi concedida com a opção GRANT OPTION, a permissão do USER3 também é revogada.*/
 
 
 -- QUESTÃO 3 ---------------------------------------------------------------------------------------------------------
