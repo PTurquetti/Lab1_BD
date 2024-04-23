@@ -193,10 +193,12 @@ Como a permissão foi concedida com a opção GRANT OPTION, a permissão do USER
 -- QUESTÃO 3 ---------------------------------------------------------------------------------------------------------
 
 
--- a) User 1 DANDO PRIVILEGIO
+-- a) User 1 conedendo privilégio de busca, referência e delete para user 2 sobre a tabela COMUNIDADE
 GRANT SELECT, REFERENCES(especie, nome), DELETE ON COMUNIDADE TO a4818232 WITH GRANT OPTION;
+-- Privilégios concedidos
 
--- b)
+
+-- b)   User 2 criando a tabela CURIOSIDADES_COMUNIDADE referenciando a tabela COMUNIDADE de User 1
 
 CREATE TABLE CURIOSIDADES_COMUNIDADE(
     NOME_COMUNIDADE VARCHAR2(15) NOT NULL,
@@ -205,11 +207,12 @@ CREATE TABLE CURIOSIDADES_COMUNIDADE(
     CONSTRAINT PK_CURIOSIDADES PRIMARY KEY(NOME_COMUNIDADE, ESPECIE_COMUNIDADE),
     CONSTRAINT FK_CURIOSIDADES FOREIGN KEY(NOME_COMUNIDADE, ESPECIE_COMUNIDADE) REFERENCES a13750791.COMUNIDADE (NOME, ESPECIE) ON DELETE CASCADE
 );
+-- Tabela criada
 
 
--- c)
--- inserindo na tabela curiosidade uma tupla referente a uma comunidade existente de user1:
+-- c) inserindo na tabela curiosidade uma tupla referente a uma comunidade existente de user1:
 INSERT INTO CURIOSIDADES_COMUNIDADE(NOME_COMUNIDADE, ESPECIE_COMUNIDADE, CURIOSIDADE) VALUES('Ordem Jedi', 'Humano', 'Os Jedi são treinados desde a infância, usam sabres de luz e têm uma conexão especial com a Força, guiando-se pelos ensinamentos do Código Jedi.');
+--Tupla inserida
 
 -- inserindo na tabela curiosidade uma tupla referente a uma comunidade não existente:
 -- INSERT INTO CURIOSIDADES_COMUNIDADE(NOME_COMUNIDADE, ESPECIE_COMUNIDADE, CURIOSIDADE) VALUES('Sithans', 'Sith', 'Os Siths abraçam o lado sombrio da Força, buscam poder absoluto e seguem o Código Sith, desafiando os Jedi em busca de domínio galáctico.');
@@ -217,11 +220,10 @@ INSERT INTO CURIOSIDADES_COMUNIDADE(NOME_COMUNIDADE, ESPECIE_COMUNIDADE, CURIOSI
 /*Relatório de erros -
 ORA-02291: restrição de integridade (A4818232.FK_CURIOSIDADES) violada - chave mãe não localizada
 
-
 Não foi possível inserir essa tupla já que foi tentado referenciar uma comunidade que não existe na tabela COMUNIDADE do usuário 1
 */
 
--- d)
+-- d) User 2 removendo da tabela COMUNIDADE do user 1 uma tupla referenciada na tabela CURIOSIDADES_COMUNIDADE
 --DELETE FROM a13750791.COMUNIDADE WHERE NOME = 'Ordem Jedi';
 
 /*Erro a partir da linha : 15 no comando -
@@ -229,21 +231,29 @@ DELETE FROM a13750791.COMUNIDADE WHERE NOME = 'Ordem Jedi'
 Relatório de erros -
 ORA-02292: restrição de integridade (A13750791.FK_HABITACAO_COMUNIDADE) violada - registro filho localizado*/
 
+/*
+Mesmo que o user 2 tenha o privilégio de remoção, ela não será permitida.Isso ocorre porque quando o user 2 tenta 
+remover uma tupla da tabela COMUNIDADE do user 1 que está sendo referenciada, a constraint de FOREIGN KEY irá 
+barrar a remoção.
+*/
+
 
 
 
 -- QUESTÃO 4 -----------------------------------------------------------------------------------------------------------
 
 
--- a)
+-- a) User 1 concedendo privilégio de busca e de criação de index sobre ESPECIE para user 2
 GRANT SELECT, INDEX ON ESPECIE TO a4818232;
+-- Privilégio concedido
 
 
--- b)
+-- b) User 2 criando um bitmap em cima da tabela 
 create bitmap index idx_especie on a13750791.especie(inteligente);
+-- Índice criado
 
 
--- c)
+-- c) User 2 fazendo consulta na tabela de user 1
 explain plan for
 select * from a13750791.especie where inteligente = 'V';
 
@@ -265,13 +275,16 @@ Predicate Information (identified by operation id):
  
    1 - filter("INTELIGENTE"='V')
 
+
+Nesse exemplo, podemos identificar que o bitmap criado não foi utilizado
+
 */
 
 
 
--- d)
+-- d) User 1 fazendo a mesma consulta na própria tabela
 explain plan for
-select * from a13750791.especie where inteligente = 'V';
+select * from especie where inteligente = 'V';
 
 SELECT plan_table_output
 FROM TABLE(dbms_xplan.display());
@@ -290,14 +303,16 @@ Predicate Information (identified by operation id):
 ---------------------------------------------------
  
    1 - filter("INTELIGENTE"='V')
+
+O índice criado por user 2 não é utilizado
 */
 
--- e)
+-- e) User 2 forçando o uso do bitmap na consulta
 
 ALTER SESSION SET OPTIMIZER_MODE = FIRST_ROWS;
 
 
--- f)
+-- f) User 2 refazendo a consulta utilizando o bitmap
 
 explain plan for
 select * from a13750791.especie where inteligente = 'V';
@@ -321,6 +336,10 @@ Predicate Information (identified by operation id):
 ---------------------------------------------------
  
    3 - access("INTELIGENTE"='V')
+
+Agora, o índice bitmap criado está sendo utilizado. No entanto, não houve nenhum ganho de desempenho
+da consulta. Inclusive, o custo em % da CPU ainda aumentou. Isso ocorre porque esse índice não
+agrega valor à consulta por utilizar um bitmap em um ambiente desfavorável
 */
 
 
@@ -422,6 +441,12 @@ SELECT * FROM VIEW_FACCAO_LIDER;
 
 -- User 3 tentando acessar a view de user 2
 SELECT * FROM a4818232.VIEW_FACCAO_LIDER;
+
+
+
+
+
+
 
 
 
