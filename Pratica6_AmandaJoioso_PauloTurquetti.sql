@@ -33,8 +33,10 @@ INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z) 
 
 
 -- iii.
--- precis de usa=er 3
-
+-- User 3 tentando fazer consulta na tabela de user 1 sem ter permissão:
+SELECT * FROM a13750791.ESTRELA;
+-- ORA-00942: a tabela ou view não existe
+-- Isso ocorre porque o user 3 não recebeu nenhuma permissão à essa tabela de user 1
 
 
 -- iv.
