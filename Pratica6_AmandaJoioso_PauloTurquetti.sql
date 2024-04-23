@@ -19,40 +19,47 @@ User 3 -  a12682435 - Darlam
 
 -- a)
 GRANT SELECT ON ESTRELA TO a4818232;
+/*Esse comando dá ao USER2 permissão de leitura (SELECT) na tabela ESTRELA do USER1. 
+Como não foi usado o GRANT OPTION, o USER2 não pode conceder essa permissão a outros usuários.
+*/
 
 -- i. 
 -- Usuário 2 fazendo busca:
 SELECT * FROM a13750791.ESTRELA;
 -- A busca foi realizada com sucesso
+/*O USER2 conseguiu realizar uma consulta na tabela ESTRELA do USER1, o que indica que
+a permissão de leitura foi concedida com sucesso.
+*/
 
 -- ii.
 -- User 2 fazendo insercao:
 
 INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, CLASSIFICACAO, MASSA, X, Y, Z) VALUES ('654321', 'Alpha Centauri A', 'M11', NULL, 4.0, 5.0, 6.0);
 -- Erro de SQL: ORA-01031: privilégios insuficientes
-
+/*Quando o USER2 tentou inserir um registro na tabela ESTRELA do USER1, recebeu um erro de privilégios insuficientes. 
+Isso ocorre porque a permissão dada ao USER 2 era apenas para leitura (SELECT), não para inserção (INSERT).*/
 
 -- iii.
 -- User 3 tentando fazer consulta na tabela de user 1 sem ter permissão:
 SELECT * FROM a13750791.ESTRELA;
 -- ORA-00942: a tabela ou view não existe
--- Isso ocorre porque o user 3 não recebeu nenhuma permissão à essa tabela de user 1
+/*Quando o USER3 tentou realizar uma consulta na tabela ESTRELA do USER1, recebeu um erro indicando que a tabela ou view não existe. 
+Isso ocorre porque o USER3 não recebeu nenhuma permissão para acessar essa tabela do USER1.*/
 
 
 -- iv.
 -- Removendo privilerio de user 2
 REVOKE SELECT ON ESTRELA FROM a4818232;
-
+/*Esse comando tira a permissão de leitura (SELECT) do USER2 na tabela ESTRELA do USER1.*/
 
 -- v.
 select * from a13750791.ESTRELA;
 /*
 ORA-00942: a tabela ou view não existe
 00942. 00000 -  "table or view does not exist"
-*Cause:    
-*Action:
-Erro na linha: 5 Coluna: 25
 */
+/*Quando o USER2 tentou realizar uma consulta na tabela ESTRELA do USER1 após a permissão de leitura ter sido retirada, 
+ele recebeu um erro indicando que a tabela ou view não existe. Isso confirma que a permissão de leitura foi retirada com sucesso.*/
 
 
 --b)
