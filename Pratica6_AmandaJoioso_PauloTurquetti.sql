@@ -68,7 +68,11 @@ GRANT SELECT ON ESTRELA TO a12682435;
 
 
 -- iii.
--- User 3
+-- User 3 tentando fazer consulta na tabela de user 1 sem ter permissão:
+SELECT * FROM a13750791.ESTRELA;
+-- ORA-00942: a tabela ou view não existe
+-- Isso ocorre porque o user 3 não recebeu nenhuma permissão à essa tabela de user 1
+
 
 
 -- iv.
@@ -145,8 +149,13 @@ GRANT SELECT, INSERT (ID_ESTRELA, NOME, X, Y, Z) ON ESTRELA TO a12682435;
 
 -- d)
 -- Refazer item a e b com user 3
+-- user 3 inserindo tupla na tabela:
+INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('654321', 'Alpha Centauri A', 4.0, 5.0, 6.0);
+-- resultado:
 
 
+--Busca antes do commit
+--Busca depois do commit
 
 -- e) 
 REVOKE SELECT, INSERT ON ESTRELA FROM a4818232;
@@ -320,17 +329,78 @@ instruído a priorizar os índices, como foi feito no caso de USER2.
 
 -- QUESTÃO 5 -------------------------------------------------------------------------------------------
 
--- User 1 garantindo privilegios para user 2:
-GRANT SELECT ON FACCAO TO a4818232;
-GRANT SELECT ON LIDER TO a4818232;
+-- Implementando cenário proposto
 
+-- User 1 garantindo privilegios para user 2:
+GRANT SELECT ON FACCAO TO a4818232 WITH GRANT OPTION;
+GRANT SELECT ON LIDER TO a4818232 WITH GRANT OPTION;
 
 -- User 2 criando view em cima das tabelas de User 1:
-
 CREATE VIEW VIEW_FACCAO_LIDER AS
-SELECT F.NOME AS NOME_FACCAO, F.LIDER AS CPI_LIDER, L.NOME AS NOME_LIDER, F.IDEOLOGIA
+SELECT F.NOME AS NOME_FACCAO, F.LIDER AS CPI_LIDER, L.NOME AS NOME_LIDER, F.IDEOLOGIA AS IDEOLOGIA
 FROM a13750791.FACCAO F
 JOIN a13750791.LIDER L ON F.LIDER = L.CPI;
+
+-- User 2 dando acesso de leitura da sua view para user 3
+GRANT SELECT ON VIEW_FACCAO_LIDER TO a12682435;
+
+-- a)
+
+/* Primeiramente, o User 1 precisa conceder o acesso às tabelas FACCAO e LIDER para  que
+o user 2 possa criar uma view com base nelas. É necessário que o privilégio seja passado 
+com GRANT OPTION para que o user 2 possa dar acesso à essa view para o user 3.
+Obs: os users já tem privilégio de criação de views.
+
+Após isso, o User 2 faz a criação da view com base nas tabelas FACCAO e LIDER do user 1.
+
+Em seguida, user 2 dará privilégio de leitura da view para o user 3. Nesse caso, não será
+necessário utilizar WITH GRANT OPTION, já que o papel de user 3 será apenas fazer leituras
+na view.
+*/
+
+
+-- b) Realizando testes:
+
+
+-- Testando acesso de user 2 às tabelas FACCAO e LIDER do user 1
+SELECT * FROM a13750791.FACCAO;
+SELECT * FROM a13750791.LIDER;
+
+
+-- Testando acesso de user 3 às tabelas FACCAO e LIDER do user 1
+SELECT * FROM a13750791.FACCAO;
+SELECT * FROM a13750791.LIDER;
+
+
+-- Testando busca do User 2 em sua view:
+SELECT * FROM VIEW_FACCAO_LIDER;
+
+-- Testando busca do User 3 na view de user 2:
+SELECT * FROM a4818232.VIEW_FACCAO_LIDER;
+
+-- Testando user 3 fazendo operações de inserção na view do user 2
+INSERT INTO a4818232.VIEW_FACCAO_LIDER(NOME_FACCAO, CPI_LIDER, NOME_LIDER, IDEOLOGIA) VALUES ();
+
+
+
+-- c) User 1 removendo de user 2 os privilégios de busca nas tabelas FACCAO e LIDER:
+REVOKE SELECT ON FACCAO FROM a4818232;
+REVOKE SELECT ON LIDER FROM a4818232;
+
+
+-- User 2 tentando acessar a sua view criada em cima das tabelas de user 1
+SELECT * FROM VIEW_FACCAO_LIDER;
+
+
+-- User 3 tentando acessar a view de user 2
+SELECT * FROM a4818232.VIEW_FACCAO_LIDER;
+
+
+
+
+
+
+
 
 
 
