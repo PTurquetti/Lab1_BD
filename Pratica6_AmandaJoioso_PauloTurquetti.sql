@@ -144,6 +144,7 @@ SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '654321';
 
 
 -- Depois do commit:
+
 -- User 1 fazendo busca:
 SELECT * FROM ESTRELA WHERE ID_ESTRELA = '654321';
 -- A tupla foi encontrada
@@ -181,7 +182,31 @@ INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('98765', 'Alph
 
 
 --Busca antes do commit
+-- user 1 fazendo busca:
+SELECT * FROM ESTRELA WHERE ID_ESTRELA = '98765';
+-- Nunhuma tupla encontrada
+
+-- user 2 fazendo busca
+SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '98765';
+-- Nenhuma tupla encontrada
+
+-- user 3 fazendo busca:
+SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '98765';
+-- 98765	Alpha Centauri B			5	6	7
+
 --Busca depois do commit
+
+-- user 1 fazendo busca:
+SELECT * FROM ESTRELA WHERE ID_ESTRELA = '98765';
+-- tupla encontrada
+
+-- user 2 fazendo busca
+SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '98765';
+-- tupla encontrada
+
+-- user 3 fazendo busca:
+SELECT * FROM a13750791.ESTRELA WHERE ID_ESTRELA = '98765';
+-- tupla encontrada
 
 -- e) 
 REVOKE SELECT, INSERT ON ESTRELA FROM a4818232;
