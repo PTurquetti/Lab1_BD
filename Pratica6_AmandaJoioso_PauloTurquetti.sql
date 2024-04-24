@@ -392,7 +392,7 @@ JOIN a13750791.LIDER L ON F.LIDER = L.CPI;
 --View VIEW_FACCAO_LIDER_PRATICA6 criado.
 
 -- User 2 dando acesso de leitura da sua view para user 3
-GRANT SELECT ON VIEW_FACCAO_LIDER TO a12682435;
+GRANT SELECT ON VIEW_FACCAO_LIDER_PRATICA6 TO a12682435;
 
 -- a)
 
@@ -420,16 +420,21 @@ SELECT * FROM a13750791.LIDER;
 -- Testando acesso de user 3 às tabelas FACCAO e LIDER do user 1
 SELECT * FROM a13750791.FACCAO;
 SELECT * FROM a13750791.LIDER;
+-- Erro. tabela ou view não existe. Isso ocorre porque não foi dada permissão de busca dessas tabelas ao user 3
+
 
 
 -- Testando busca do User 2 em sua view:
-SELECT * FROM VIEW_FACCAO_LIDER;
+SELECT * FROM VIEW_FACCAO_LIDER_PRATICA6;
+-- É possível fazer busca na view que ele mesmo criou
+
 
 -- Testando busca do User 3 na view de user 2:
-SELECT * FROM a4818232.VIEW_FACCAO_LIDER;
+SELECT * FROM a4818232.VIEW_FACCAO_LIDER_PRATICA6;
+-- É possível fazer busca na view do user 2
 
 -- Testando user 3 fazendo operações de inserção na view do user 2
-INSERT INTO a4818232.VIEW_FACCAO_LIDER(NOME_FACCAO, CPI_LIDER, NOME_LIDER, IDEOLOGIA) VALUES ();
+INSERT INTO a4818232.VIEW_FACCAO_LIDER_PRATICA6(NOME_FACCAO, CPI_LIDER, NOME_LIDER, IDEOLOGIA) VALUES ();
 
 
 
@@ -444,6 +449,9 @@ SELECT * FROM VIEW_FACCAO_LIDER;
 
 -- User 3 tentando acessar a view de user 2
 SELECT * FROM a4818232.VIEW_FACCAO_LIDER;
+/*
+Erro: tabela ou view não existe. Isso ocorre porque o user 2 perdeu o acesso das tabelas em que sua
+view foi baseada. Sendo assim, o user 3 também perde o acesso à view
 
 
 
