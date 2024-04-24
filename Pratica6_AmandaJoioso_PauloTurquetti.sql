@@ -179,6 +179,7 @@ então o USER3 não poderá conceder essas permissões a outros usuários.*/
 INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('654321', 'Alpha Centauri A', 4.0, 5.0, 6.0);
 -- resultado:
 
+INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('98765', 'Alpha Centauri B', 5.0, 6.0, 7.0);
 
 --Busca antes do commit
 --Busca depois do commit
