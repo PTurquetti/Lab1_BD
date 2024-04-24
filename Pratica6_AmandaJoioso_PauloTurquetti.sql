@@ -444,11 +444,12 @@ REVOKE SELECT ON LIDER FROM a4818232;
 
 
 -- User 2 tentando acessar a sua view criada em cima das tabelas de user 1
-SELECT * FROM VIEW_FACCAO_LIDER;
+SELECT * FROM VIEW_FACCAO_LIDER_PRATICA6;
+-- ORA-04063: view "A4818232.VIEW_FACCAO_LIDER_PRATICA6" contém erros
 
 
 -- User 3 tentando acessar a view de user 2
-SELECT * FROM a4818232.VIEW_FACCAO_LIDER;
+SELECT * FROM a4818232.VIEW_FACCAO_LIDER_PRATICA6;
 /*
 Erro: tabela ou view não existe. Isso ocorre porque o user 2 perdeu o acesso das tabelas em que sua
 view foi baseada. Sendo assim, o user 3 também perde o acesso à view
