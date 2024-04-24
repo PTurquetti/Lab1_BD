@@ -177,8 +177,7 @@ então o USER3 não poderá conceder essas permissões a outros usuários.*/
 -- Refazer item a e b com user 3
 -- user 3 inserindo tupla na tabela:
 INSERT INTO a13750791.ESTRELA (ID_ESTRELA, NOME, X, Y, Z) VALUES ('98765', 'Alpha Centauri B', 5.0, 6.0, 7.0);
-
--- resultado:
+-- Tupla inserida com sucesso
 
 
 --Busca antes do commit
