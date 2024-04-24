@@ -381,6 +381,7 @@ instruído a priorizar os índices, como foi feito no caso de USER2.
 -- User 1 garantindo privilegios para user 2:
 GRANT SELECT ON FACCAO TO a4818232 WITH GRANT OPTION;
 GRANT SELECT ON LIDER TO a4818232 WITH GRANT OPTION;
+-- Grants bem sucedidos
 
 -- User 2 criando view em cima das tabelas de User 1:
 CREATE VIEW VIEW_FACCAO_LIDER AS
