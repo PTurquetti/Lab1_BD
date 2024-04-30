@@ -19,6 +19,9 @@ INSERT INTO ORBITA_ESTRELA(ORBITANTE, ORBITADA) VALUES ('Alp CrA', 'Alp Col');
 INSERT INTO FEDERACAO(NOME, DATA_FUND) VALUES ('FED1', TO_DATE('2024-04-29', 'YYYY-MM-DD'));
 INSERT INTO FEDERACAO(NOME, DATA_FUND) VALUES ('FED2', TO_DATE('2024-04-29', 'YYYY-MM-DD'));
 
+-- Para questão 3
+INSERT INTO COMUNIDADE (ESPECIE, NOME, QTD_HABITANTES) VALUES ('A', 'COMUNIDADE 1', 600);
+INSERT INTO COMUNIDADE (ESPECIE, NOME, QTD_HABITANTES) VALUES ('A ab dolore', 'COMUNIDADE 2', 1200);
 
 
 -- QUESTÃO 1 -----------------------------------------------------------------------------------------------
@@ -86,30 +89,68 @@ NENHUMA FEDERACAO FOI REMOVIDA  --(antes de inserir federações sem nação)
 
 
 
--- 3.
+-- QUESTÃO 3 -----------------------------------------------------------------------
 DECLARE
-  v_planeta PLANETA.ID_ASTRO%TYPE := 'nome_do_planeta';
-  v_comunidade COMUNIDADE.NOME%TYPE := 'nome_da_comunidade';
-  v_especie COMUNIDADE.ESPECIE%TYPE := 'nome_da_especie';
-  v_qtd_habitantes COMUNIDADE.QTD_HABITANTES%TYPE;
-  v_data_ini HABITACAO.DATA_INI%TYPE := SYSDATE;
-  v_data_fim HABITACAO.DATA_FIM%TYPE;
-BEGIN
-  SELECT QTD_HABITANTES INTO v_qtd_habitantes FROM COMUNIDADE WHERE NOME = v_comunidade AND ESPECIE = v_especie;
-  IF v_qtd_habitantes <= 1000 THEN
-    v_data_fim := v_data_ini + INTERVAL '100' YEAR;
-  ELSE
-    v_data_fim := v_data_ini + INTERVAL '50' YEAR;
-  END IF;
-  INSERT INTO HABITACAO (PLANETA, ESPECIE, COMUNIDADE, DATA_INI, DATA_FIM) VALUES (v_planeta, v_especie, v_comunidade, v_data_ini, v_data_fim);
-  DBMS_OUTPUT.PUT_LINE('Comunidade ' || v_comunidade || ' da espécie ' || v_especie || ' agora habita o planeta ' || v_planeta || ' de ' || v_data_ini || ' até ' || v_data_fim);
-EXCEPTION
-  WHEN NO_DATA_FOUND THEN
-    DBMS_OUTPUT.PUT_LINE('Comunidade ou espécie não encontrada.');
+    V_PLANETA PLANETA.ID_ASTRO%TYPE := 'Quae possimus.';
+    V_COMUNIDADE_ESPECIE COMUNIDADE.ESPECIE%TYPE := 'A';
+    V_COMUNIDADE_NOME COMUNIDADE.NOME%TYPE := 'COMUNIDADE 1';
+
+    V_DATA_INI DATE := TO_DATE(SYSDATE, 'DD/MM/YYYY');
+    V_DATA_FIM DATE;
+    
+    V_HABITANTES NUMBER;
+    V_ESPECIE_PLANETA_OR ESPECIE.PLANETA_OR%TYPE;
+    V_ESPECIE_INTELIGENTE ESPECIE.INTELIGENTE%TYPE;
+BEGIN 
+    SELECT QTD_HABITANTES INTO V_HABITANTES FROM COMUNIDADE
+            WHERE NOME = V_COMUNIDADE_NOME AND ESPECIE = V_COMUNIDADE_ESPECIE; 
+
+    IF V_HABITANTES <= 1000 THEN
+        -- Adiciona 100 anos
+        V_DATA_FIM := ADD_MONTHS(SYSDATE, 1200); 
+    ELSE
+        -- Adiciona 50 anos
+        V_DATA_FIM := ADD_MONTHS(SYSDATE, 600); 
+    END IF;
+
+    -- Insere na tabela
+    INSERT INTO HABITACAO(PLANETA, ESPECIE, COMUNIDADE, DATA_INI, DATA_FIM)
+    VALUES (V_PLANETA, V_COMUNIDADE_ESPECIE, V_COMUNIDADE_NOME, V_DATA_INI, V_DATA_FIM);
+    
+    DBMS_OUTPUT.PUT_LINE('HABITACAO ADICIONADA');
+    
+    SELECT PLANETA_OR, INTELIGENTE 
+    INTO V_ESPECIE_PLANETA_OR, V_ESPECIE_INTELIGENTE 
+    FROM ESPECIE WHERE NOME = V_COMUNIDADE_ESPECIE;
+    
+    DBMS_OUTPUT.PUT_LINE('Infos da Especie:');
+    
+    DBMS_OUTPUT.PUT_LINE('Especie: ' || V_COMUNIDADE_ESPECIE);
+    DBMS_OUTPUT.PUT_LINE('Planeta Origem: ' || V_ESPECIE_PLANETA_OR);
+    DBMS_OUTPUT.PUT_LINE('Inteligente: ' || V_ESPECIE_INTELIGENTE);
+
+    DBMS_OUTPUT.PUT_LINE('Infos da habitacao dessa especie:');
+    DBMS_OUTPUT.PUT_LINE('Data inicio: ' || V_DATA_INI);
+    DBMS_OUTPUT.PUT_LINE('Data fim: ' || V_DATA_FIM);
+
+
+    COMMIT;
 END;
 
+/* SAIDA DBMS
 
--- 4.
+HABITACAO ADICIONADA
+Infos da Especie:
+Especie: A
+Planeta Origem: Magni ex rerum.
+Inteligente: V
+Infos da habitacao dessa especie:
+Data inicio: 30/04/24
+Data fim: 30/04/24
+
+*/
+
+-- QUESTÃO 4 -----------------------------------------------------------------------------------
 DECLARE
   v_classificacao ESTRELA.CLASSIFICACAO%TYPE := 'classificacao_da_estrela';
   v_distancia_minima NUMBER := valor_da_distancia_minima;
