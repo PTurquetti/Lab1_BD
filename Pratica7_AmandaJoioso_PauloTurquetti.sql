@@ -69,6 +69,15 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('QUANTIDADE DE ESTRELAS ORBITANTES: ' || V_MAX_ORBITANTES);
     CLOSE C_ORBITA_ESTRELA;
     -- fecha cursor
+    
+-- tratamento de excessoes 
+EXCEPTION
+    -- busca do cursor nao encontrou nenhum valor correspondente
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Nenhuma orbita de estrelas detectada');
+    -- Outro erro inesperado
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Ocorreu um erro não especificado.');
 END;
 
 /* SAÍDA DBMS
@@ -109,6 +118,11 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('NENHUMA FEDERACAO FOI REMOVIDA');
     END IF;
     COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Algo deu errado');
+
 END;
 
 /* SAÍDA DBMS:
@@ -188,6 +202,19 @@ BEGIN
 
     -- commitando
     COMMIT;
+
+-- TRATAMENTO DE EXCESSOES
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        dbms_output.put_line('Não há uma espécie ou comunidade equivalente');
+
+    WHEN TOO_MANY_ROWS THEN
+        dbms_output.put_line('Existe mais de uma espécie ou comunidade correspondente');
+
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Algo deu errado');
+
+    
 END;
 
 /* SAIDA DBMS
@@ -259,13 +286,28 @@ BEGIN
     COMMIT;
     CLOSE C_ORBITA_PLANETA;
     -- encerra cursor
+
+EXCEPTION
+    -- usuário digitou distancia minima negativa
+    WHEN E_DISTANCIA_NEGATIVA
+        THEN dbms_output.put_line('Valor de distancia inválido');
+    -- cursor vazio
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Nenhuma óribta de planeta a uma estrela com essa classificacao foi encontrada');
+    -- Outro erro inesperado
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Ocorreu um erro não especificado.');
+    
 END;
 
 /*
 
 -- SAÍDA DBMS:
-
 3 TUPLAS DE ORBITA_PLANETA FORAM REMOVIDAS
+
+
+-- Saída DBMS com distância negativa:
+Valor de distancia inválido
 
 
 -- TABELA ORBITA_PLANETA ANTES DA EXECUCAO:
