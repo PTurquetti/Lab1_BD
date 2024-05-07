@@ -277,6 +277,7 @@ com o desempenho e tempo de execução muito menores do que quando FORALL não �
 
 -- QUESTÃO 2 -------------------------------------------------------------------------
 DECLARE
+    -- Definindo o tipo de registro para armazenar informações sobre planetas
     TYPE PlanetInfoType IS RECORD (
         PlanetaID VARCHAR2(15),
         NacaoDominante VARCHAR2(15),
@@ -289,25 +290,39 @@ DECLARE
         FaccaoMajoritaria VARCHAR2(15),
         QtdEspeciesOrigem NUMBER
     );
-    
+
+    -- Definindo o tipo de tabela indexada por inteiro para armazenar registros de informações sobre planetas
     TYPE PlanetInfoTableType IS TABLE OF PlanetInfoType INDEX BY PLS_INTEGER;
 
+    -- Declarando uma variável para armazenar informações sobre planetas
     PlanetInfo PlanetInfoTableType;
+
 BEGIN
-    FOR PlanetRec IN (SELECT p.ID_ASTRO AS PlanetaID,
-                              d.NACAO AS NacaoDominante,
-                              d.DATA_INI AS DataInicioDom,
-                              d.DATA_FIM AS DataFimDom,
-                              (SELECT COUNT(*) FROM HABITACAO h WHERE h.PLANETA = p.ID_ASTRO) AS QtdComunidades,
-                              (SELECT COUNT(DISTINCT e.ESPECIE) FROM HABITACAO e WHERE e.PLANETA = p.ID_ASTRO) AS QtdEspecies,
-                              (SELECT SUM(c.QTD_HABITANTES) FROM COMUNIDADE c WHERE c.ESPECIE IN (SELECT DISTINCT h.ESPECIE FROM HABITACAO h WHERE h.PLANETA = p.ID_ASTRO)) AS QtdHabitantes,
-                              (SELECT COUNT(DISTINCT f.FACCAO) FROM PARTICIPA f JOIN FACCAO fac ON f.FACCAO = fac.NOME) AS QtdFaccoes,
-                              (SELECT f.NOME FROM NACAO n JOIN NACAO_FACCAO nf ON n.NOME = nf.NACAO JOIN FACCAO f ON nf.FACCAO = f.NOME WHERE n.NOME = d.NACAO GROUP BY f.NOME ORDER BY COUNT(*) DESC FETCH FIRST 1 ROW ONLY) AS FaccaoMajoritaria,
-                              (SELECT COUNT(DISTINCT e.NOME) FROM ESPECIE e WHERE e.PLANETA_OR = p.ID_ASTRO) AS QtdEspeciesOrigem
-                       FROM PLANETA p
-                       LEFT JOIN DOMINANCIA d ON p.ID_ASTRO = d.PLANETA
-                       WHERE p.ID_ASTRO IS NOT NULL)
+    -- Loop para preencher a tabela de informações dos planetas
+    FOR PlanetRec IN (
+        -- Selecionando dados dos planetas e suas informações associadas
+        SELECT p.ID_ASTRO AS PlanetaID,
+               d.NACAO AS NacaoDominante,
+               d.DATA_INI AS DataInicioDom,
+               d.DATA_FIM AS DataFimDom,
+               -- número de comunidades em cada planeta
+               (SELECT COUNT(*) FROM HABITACAO h WHERE h.PLANETA = p.ID_ASTRO) AS QtdComunidades,
+               --número de espécies distintas em cada planeta
+               (SELECT COUNT(DISTINCT e.ESPECIE) FROM HABITACAO e WHERE e.PLANETA = p.ID_ASTRO) AS QtdEspecies,
+               -- habitantes do planeta
+               (SELECT SUM(c.QTD_HABITANTES) FROM COMUNIDADE c WHERE c.ESPECIE IN (SELECT DISTINCT h.ESPECIE FROM HABITACAO h WHERE h.PLANETA = p.ID_ASTRO)) AS QtdHabitantes,
+               -- facções distintas
+               (SELECT COUNT(DISTINCT f.FACCAO) FROM PARTICIPA f JOIN FACCAO fac ON f.FACCAO = fac.NOME) AS QtdFaccoes,
+               --  facção majoritária
+               (SELECT f.NOME FROM NACAO n JOIN NACAO_FACCAO nf ON n.NOME = nf.NACAO JOIN FACCAO f ON nf.FACCAO = f.NOME WHERE n.NOME = d.NACAO GROUP BY f.NOME ORDER BY COUNT(*) DESC FETCH FIRST 1 ROW ONLY) AS FaccaoMajoritaria,
+               -- quantidade de espécies
+               (SELECT COUNT(DISTINCT e.NOME) FROM ESPECIE e WHERE e.PLANETA_OR = p.ID_ASTRO) AS QtdEspeciesOrigem
+        FROM PLANETA p
+        LEFT JOIN DOMINANCIA d ON p.ID_ASTRO = d.PLANETA
+        WHERE p.ID_ASTRO IS NOT NULL
+    )
     LOOP
+        -- Inserindo dados na tabela de informações dos planetas
         PlanetInfo(PlanetInfo.COUNT + 1).PlanetaID := PlanetRec.PlanetaID;
         PlanetInfo(PlanetInfo.COUNT).NacaoDominante := PlanetRec.NacaoDominante;
         PlanetInfo(PlanetInfo.COUNT).DataInicioDom := PlanetRec.DataInicioDom;
@@ -320,6 +335,7 @@ BEGIN
         PlanetInfo(PlanetInfo.COUNT).QtdEspeciesOrigem := PlanetRec.QtdEspeciesOrigem;
     END LOOP;
     
+    -- Printando tabela de infrmaçoes dos planetas
     FOR i IN 1..PlanetInfo.COUNT LOOP
         DBMS_OUTPUT.PUT_LINE('Planeta: ' || PlanetInfo(i).PlanetaID);
         DBMS_OUTPUT.PUT_LINE('Nação Dominante: ' || NVL(PlanetInfo(i).NacaoDominante, 'Nenhuma'));
@@ -334,6 +350,7 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE(' ');
     END LOOP;
 END;
+
 
 /* SAÍDA DBMS (alguns exemplos, já que a saída é muito grande)
 
