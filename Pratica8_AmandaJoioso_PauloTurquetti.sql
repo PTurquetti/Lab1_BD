@@ -24,7 +24,7 @@ JOIN DOMINANCIA D ON D.NACAO = N.NOME;
 
 
 -- QUESTÃO 2 -------------------------------------------------------------------------
-
+-- Ta dando erro pq da dando overflow, nem eu nem o gpt sabemos como corrigir :) tbm ta falando q nenhum planeta tem informacao, n sei oq fz (:
 DECLARE
   TYPE t_planeta_info IS TABLE OF PLANETA%ROWTYPE INDEX BY PLS_INTEGER;
   v_planeta_info t_planeta_info;
@@ -76,4 +76,23 @@ BEGIN
       DBMS_OUTPUT.PUT_LINE('Data de início da última dominação: ' || v_data_ini);
       DBMS_OUTPUT.PUT_LINE('Data de fim da última dominação: ' || v_data_fim);
       DBMS_OUTPUT.PUT_LINE('Quantidade de comunidades: ' || v_qtd_comunidades);
-      DBMS_OUTPUT.PUT_LINE('Quantidade de espécies: ' || v_q
+      DBMS_OUTPUT.PUT_LINE('Quantidade de espécies: ' || v_qtd_especies);
+      DBMS_OUTPUT.PUT_LINE('Quantidade de habitantes: ' || v_qtd_habitantes);
+      DBMS_OUTPUT.PUT_LINE('Quantidade de facções: ' || v_qtd_faccoes);
+      DBMS_OUTPUT.PUT_LINE('Facção majoritária: ' || v_facao_majoritaria);
+      DBMS_OUTPUT.PUT_LINE('Quantidade de espécies que tiveram origem no planeta: ' || v_qtd_especies_origem);
+      DBMS_OUTPUT.PUT_LINE('----------------------------------------------');
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Nenhuma informação encontrada para o planeta: ' || v_planeta_info(v_index).ID_ASTRO);
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro ao processar o planeta: ' || v_planeta_info(v_index).ID_ASTRO);
+        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+    END;
+  END LOOP;
+EXCEPTION
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('Erro ao executar o programa PL/SQL');
+    DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM);
+END;
+/
