@@ -54,6 +54,7 @@ DECLARE
     -- FACCAO DE ENTRADA DO USUARIO
     V_FACCAO FACCAO.NOME%TYPE := 'Prog Celestiais';
 
+    -- CURSOR - COMUNIDADES QUE HABITAM PLANETAS DOMINADOS POR NACOES ONDE FACCAO ESTA PRESENTE MAS NAO FAZEM PARTE DA FACCAO
     CURSOR C_COMUNIDADES IS
         SELECT DISTINCT C.NOME AS NOME_COMUNIDADE, C.ESPECIE AS ESPECIE_COMUNIDADE, C.QTD_HABITANTES AS HABITANTES  
         FROM NACAO_FACCAO NF
@@ -80,16 +81,69 @@ BEGIN
         T_COMUNIDADE(T_COMUNIDADE.LAST) := R_COMUNIDADE;
     END LOOP;
 
+    
+    DBMS_OUTPUT.PUT_LINE('Inserindo em PARTICIPA:');
     FOR I_INDEX IN T_COMUNIDADE.FIRST..T_COMUNIDADE.LAST
     LOOP
-        DBMS_OUTPUT.PUT_LINE('Nome da Comunidade: ' || T_COMUNIDADE(I_INDEX).NOME_COMUNIDADE);
-        DBMS_OUTPUT.PUT_LINE('Espécie da Comunidade: ' || T_COMUNIDADE(I_INDEX).ESPECIE_COMUNIDADE);
-        DBMS_OUTPUT.PUT_LINE('Quantidade de Habitantes: ' || T_COMUNIDADE(I_INDEX).HABITANTES);
+        INSERT INTO PARTICIPA (FACCAO, COMUNIDADE, ESPECIE) 
+            VALUES (V_FACCAO, T_COMUNIDADE(I_INDEX).NOME_COMUNIDADE, T_COMUNIDADE(I_INDEX).ESPECIE_COMUNIDADE);
+            DBMS_OUTPUT.PUT_LINE('Facção: ' || V_FACCAO);
+            DBMS_OUTPUT.PUT_LINE('Nome da Comunidade: ' || T_COMUNIDADE(I_INDEX).NOME_COMUNIDADE);
+            DBMS_OUTPUT.PUT_LINE('Espécie da Comunidade: ' || T_COMUNIDADE(I_INDEX).ESPECIE_COMUNIDADE);
+            DBMS_OUTPUT.PUT_LINE('------------------------------------------------------');
+
     END LOOP;
+    COMMIT;
 END;
 
+/* RESULTADOS:
+
+RESULTADO DA BUSCA FEITA NO CURSOR: COMUNIDADES QUE HABITAM PLANETAS DOMINADOS 
+POR NACOES ONDE FACCAO ESCOLHIDA ESTA PRESENTE MAS NAO FAZEM PARTE DA FACCAO:
+
+NOME_COMUNIDADE_____ESPECIE_COMUNIDADE_____HABITANTES
+Com Rerum	         Rerum optio	        100
+Com Neque	         Neque eaque ad	        1200
+Com Labore         	 Vero labore	        300
 
 
+
+TABELA PARTICIPA ANTES DA EXECUÇÃO:
+
+___FACCAO_______ESPECIE________COMUNIDADE
+Cons Cósmicos	Quam aut	   Com Quam
+Prog Celestiais	Libero magni   Com Lib
+
+
+
+
+TABELA PARTICIPA DEPOIS DA EXEÇÃO:
+
+___FACCAO_______ESPECIE________COMUNIDADE
+Cons Cósmicos	Quam aut	    Com Quam
+Prog Celestiais	Libero magni	Com Lib
+Prog Celestiais	Neque eaque ad	Com Neque
+Prog Celestiais	Rerum optio	    Com Rerum
+Prog Celestiais	Vero labore	    Com Labore
+
+
+
+
+SAÍDA DBMS:
+
+Inserindo em PARTICIPA:
+Facção: Prog Celestiais
+Nome da Comunidade: Com Rerum
+Espécie da Comunidade: Rerum optio
+------------------------------------------------------
+Facção: Prog Celestiais
+Nome da Comunidade: Com Neque
+Espécie da Comunidade: Neque eaque ad
+------------------------------------------------------
+Facção: Prog Celestiais
+Nome da Comunidade: Com Labore
+Espécie da Comunidade: Vero labore
+------------------------------------------------------
 
 
 
