@@ -50,7 +50,7 @@ INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE) VALUES ('Cons Cósmicos', 'Q
 -- QUESTÃO 1 -------------------------------------------------------------------------
 
 -- a)
-DECLARE
+DECLARE    
     --Excessão cursor vazio
     E_CURSOR_VAZIO EXCEPTION;
     
@@ -77,7 +77,7 @@ DECLARE
     --DECLARACAO E INICIACAO DA VARIAVEL DE NESTED TABLE
     T_COMUNIDADE T_COMUNIDADE_TYPE := T_COMUNIDADE_TYPE();
 
-BEGIN
+BEGIN    
     FOR R_COMUNIDADE IN C_COMUNIDADES
     LOOP
         T_COMUNIDADE.EXTEND;
@@ -106,6 +106,7 @@ EXCEPTION
     -- CURSOR VAZIO
     WHEN E_CURSOR_VAZIO THEN
         DBMS_OUTPUT.PUT_LINE('Busca do cursor retornou vazia');
+
     WHEN OTHERS THEN
         -- Exibição de mensagem de erro
         DBMS_OUTPUT.PUT_LINE('Erro durante a execução do bloco PL/SQL:');
@@ -382,6 +383,14 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('Quantidade de Espécies de Origem: ' || PlanetInfo(i).QtdEspeciesOrigem);
         DBMS_OUTPUT.PUT_LINE(' ');
     END LOOP;
+
+EXCEPTION
+    -- Tratamento de erro de consulta
+    WHEN E_QUERY_ERROR THEN
+        DBMS_OUTPUT.PUT_LINE('Erro durante a consulta');
+    -- Tratamento de outras exceções
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro inesperado');
 END;
 
 
