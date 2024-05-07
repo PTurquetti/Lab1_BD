@@ -51,6 +51,9 @@ INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE) VALUES ('Cons Cósmicos', 'Q
 
 -- a)
 DECLARE
+    --Excessão cursor vazio
+    E_CURSOR_VAZIO EXCEPTION;
+    
     -- FACCAO DE ENTRADA DO USUARIO
     V_FACCAO FACCAO.NOME%TYPE := 'Prog Celestiais';
 
@@ -82,6 +85,8 @@ BEGIN
     END LOOP;
 
     IF T_COMUNIDADE.COUNT = 0 THEN
+        RAISE E_CURSOR_VAZIO;
+    END IF;
 
     
     DBMS_OUTPUT.PUT_LINE('Inserindo em PARTICIPA:');
@@ -98,13 +103,14 @@ BEGIN
     COMMIT;
 
 EXCEPTION
-    -- Captura de exceções gerais
+    -- CURSOR VAZIO
+    WHEN E_CURSOR_VAZIO THEN
+        DBMS_OUTPUT.PUT_LINE('Busca do cursor retornou vazia');
     WHEN OTHERS THEN
         -- Exibição de mensagem de erro
         DBMS_OUTPUT.PUT_LINE('Erro durante a execução do bloco PL/SQL:');
-        DBMS_OUTPUT.PUT_LINE(SQLERRM);
-        -- Rollback da transação
         ROLLBACK;
+
 END;
 
 /* RESULTADOS:
@@ -169,6 +175,9 @@ INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE) VALUES ('Cons Cósmicos', 'Q
 
 -- Utilizando FORALL
 DECLARE
+    --Excessão cursor vazio
+    E_CURSOR_VAZIO EXCEPTION;
+
     -- FACCAO DE ENTRADA DO USUARIO
     V_FACCAO FACCAO.NOME%TYPE := 'Prog Celestiais';
 
@@ -199,6 +208,10 @@ BEGIN
         T_COMUNIDADE(T_COMUNIDADE.LAST) := R_COMUNIDADE;
     END LOOP;
 
+    IF T_COMUNIDADE.COUNT = 0 THEN
+        RAISE E_CURSOR_VAZIO;
+    END IF;
+
     DBMS_OUTPUT.PUT_LINE('Inserindo tuplas em PARTICIPA:');
 
     -- INSERINDO AS NOVAS TUPLAS
@@ -217,6 +230,15 @@ BEGIN
     END LOOP;
 
     COMMIT;
+EXCEPTION
+    -- CURSOR VAZIO
+    WHEN E_CURSOR_VAZIO THEN
+        DBMS_OUTPUT.PUT_LINE('Busca do cursor retornou vazia');
+
+    WHEN OTHERS THEN
+        -- Exibição de mensagem de erro
+        DBMS_OUTPUT.PUT_LINE('Erro durante a execução do bloco PL/SQL:');
+        ROLLBACK;
 END;
 
 /* RESULTADOS:
