@@ -144,13 +144,135 @@ Facção: Prog Celestiais
 Nome da Comunidade: Com Labore
 Espécie da Comunidade: Vero labore
 ------------------------------------------------------
+*/
+
+
+-- b)
+
+-- Voltando tabela PARTICIPA para o estado original
+DELETE FROM PARTICIPA;
+
+INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE) VALUES ('Prog Celestiais', 'Libero magni', 'Com Lib');
+INSERT INTO PARTICIPA (FACCAO, ESPECIE, COMUNIDADE) VALUES ('Cons Cósmicos', 'Quam aut', 'Com Quam');
+
+
+-- Utilizando FORALL
+DECLARE
+    -- FACCAO DE ENTRADA DO USUARIO
+    V_FACCAO FACCAO.NOME%TYPE := 'Prog Celestiais';
+
+    -- CURSOR - COMUNIDADES QUE HABITAM PLANETAS DOMINADOS POR NACOES ONDE FACCAO ESTA PRESENTE MAS NAO FAZEM PARTE DA FACCAO
+    CURSOR C_COMUNIDADES IS
+        SELECT DISTINCT C.NOME AS NOME_COMUNIDADE, C.ESPECIE AS ESPECIE_COMUNIDADE, C.QTD_HABITANTES AS HABITANTES  
+        FROM NACAO_FACCAO NF
+        JOIN NACAO N ON NF.NACAO = N.NOME
+        JOIN DOMINANCIA D ON D.NACAO = N.NOME
+        JOIN PLANETA P ON P.ID_ASTRO = D.PLANETA
+        JOIN HABITACAO H ON P.ID_ASTRO = H.PLANETA
+        JOIN COMUNIDADE C ON C.ESPECIE = H.ESPECIE AND C.NOME = H.COMUNIDADE
+        WHERE NF.FACCAO = V_FACCAO AND (C.NOME, C.ESPECIE) NOT IN
+        (SELECT C.NOME, C.ESPECIE FROM  
+        PARTICIPA P JOIN COMUNIDADE C ON P.ESPECIE = C.ESPECIE AND P.COMUNIDADE = C.NOME
+        WHERE FACCAO = V_FACCAO);
+
+    --DECLARACAO DO TIPO DA NESTED TABLE
+    TYPE T_COMUNIDADE_TYPE IS TABLE OF C_COMUNIDADES%ROWTYPE;
+
+    --DECLARACAO E INICIACAO DA VARIAVEL DE NESTED TABLE
+    T_COMUNIDADE T_COMUNIDADE_TYPE := T_COMUNIDADE_TYPE();
+
+BEGIN
+    FOR R_COMUNIDADE IN C_COMUNIDADES
+    LOOP
+        T_COMUNIDADE.EXTEND;
+        T_COMUNIDADE(T_COMUNIDADE.LAST) := R_COMUNIDADE;
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('Inserindo tuplas em PARTICIPA:');
+
+    -- INSERINDO AS NOVAS TUPLAS
+    FORALL I_INDEX IN T_COMUNIDADE.FIRST..T_COMUNIDADE.LAST
+        INSERT INTO PARTICIPA (FACCAO, COMUNIDADE, ESPECIE) 
+            VALUES (V_FACCAO, T_COMUNIDADE(I_INDEX).NOME_COMUNIDADE, T_COMUNIDADE(I_INDEX).ESPECIE_COMUNIDADE);
+
+    FOR I_INDEX IN T_COMUNIDADE.FIRST..T_COMUNIDADE.LAST
+
+    -- IMPRESSOES DO RESULTADO
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Facção: ' || V_FACCAO);
+        DBMS_OUTPUT.PUT_LINE('Nome da Comunidade: ' || T_COMUNIDADE(I_INDEX).NOME_COMUNIDADE);
+        DBMS_OUTPUT.PUT_LINE('Espécie da Comunidade: ' || T_COMUNIDADE(I_INDEX).ESPECIE_COMUNIDADE);
+        DBMS_OUTPUT.PUT_LINE('------------------------------------------------------');
+    END LOOP;
+
+    COMMIT;
+END;
+
+/* RESULTADOS:
+
+RESULTADO DA BUSCA FEITA NO CURSOR: COMUNIDADES QUE HABITAM PLANETAS DOMINADOS 
+POR NACOES ONDE FACCAO ESCOLHIDA ESTA PRESENTE MAS NAO FAZEM PARTE DA FACCAO:
+
+NOME_COMUNIDADE_____ESPECIE_COMUNIDADE_____HABITANTES
+Com Rerum	         Rerum optio	        100
+Com Neque	         Neque eaque ad	        1200
+Com Labore         	 Vero labore	        300
+
+
+
+TABELA PARTICIPA ANTES DA EXECUÇÃO:
+
+___FACCAO_______ESPECIE________COMUNIDADE
+Cons Cósmicos	Quam aut	   Com Quam
+Prog Celestiais	Libero magni   Com Lib
 
 
 
 
+TABELA PARTICIPA DEPOIS DA EXEÇÃO:
+
+___FACCAO_______ESPECIE________COMUNIDADE
+Cons Cósmicos	Quam aut	    Com Quam
+Prog Celestiais	Libero magni	Com Lib
+Prog Celestiais	Neque eaque ad	Com Neque
+Prog Celestiais	Rerum optio	    Com Rerum
+Prog Celestiais	Vero labore	    Com Labore
 
 
 
+
+SAÍDA DBMS:
+
+Inserindo em PARTICIPA:
+Facção: Prog Celestiais
+Nome da Comunidade: Com Rerum
+Espécie da Comunidade: Rerum optio
+------------------------------------------------------
+Facção: Prog Celestiais
+Nome da Comunidade: Com Neque
+Espécie da Comunidade: Neque eaque ad
+------------------------------------------------------
+Facção: Prog Celestiais
+Nome da Comunidade: Com Labore
+Espécie da Comunidade: Vero labore
+------------------------------------------------------
+
+
+
+ANALISANDO DIFERENÇA DO USO DE FORALL
+
+Quando dentro de um bloco PL/SQL executamos um comando
+DML, teremos um fenômeno chamado TROCA DE CONTEXTO. Quando estamos trabalhando com um
+pequeno número de dados (como no exemplo executado acima, com poucas tuplas nas tabelas),
+essas trocas de contexto acabam não atrapalhando o desempenho. No entanto, a partir do
+momento que temos uma grande quantidade de dados, essas várias trocas de contexto podem
+fazer o desempenho cair drasticamente. Para resolver essa questão, implementamos o comando FORALL
+
+A operação FORALL permite processamento em lotez. Isso significa que as operações de inserção serão realizada
+numa única vez, sendo necessária apenas uma troca de contexto.Como resultado, teremos operações DML
+com o desempenho e tempo de execução muito menores do que quando FORALL não é utilizado
+
+*/
 
 
 -- QUESTÃO 2 -------------------------------------------------------------------------
