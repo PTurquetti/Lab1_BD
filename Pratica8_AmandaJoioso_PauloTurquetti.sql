@@ -276,81 +276,111 @@ com o desempenho e tempo de execução muito menores do que quando FORALL não �
 
 
 -- QUESTÃO 2 -------------------------------------------------------------------------
--- Ta dando erro pq da dando overflow, nem eu nem o gpt sabemos como corrigir :) tbm ta falando q nenhum planeta tem informacao, n sei oq fz (:
 DECLARE
-  -- Declaração de tipos e variáveis
-  TYPE t_planeta_info IS TABLE OF PLANETA%ROWTYPE INDEX BY PLS_INTEGER; -- Define um tipo de tabela baseado na estrutura da tabela PLANETA
-  v_planeta_info t_planeta_info; -- Variável que vai armazenar os dados dos planetas
-  v_index NUMBER; -- Variável para o índice do loop
-  v_nacao_dominante DOMINANCIA.NACAO%TYPE; -- Variável para armazenar a nação dominante
-  v_data_ini DOMINANCIA.DATA_INI%TYPE; -- Variável para armazenar a data de início da dominação
-  v_data_fim DOMINANCIA.DATA_FIM%TYPE; -- Variável para armazenar a data de fim da dominação
-  v_qtd_comunidades NUMBER; -- Variável para armazenar a quantidade de comunidades
-  v_qtd_especies NUMBER; -- Variável para armazenar a quantidade de espécies
-  v_qtd_habitantes NUMBER; -- Variável para armazenar a quantidade de habitantes
-  v_qtd_faccoes NUMBER; -- Variável para armazenar a quantidade de facções
-  v_facao_majoritaria FACCAO.NOME%TYPE; -- Variável para armazenar a facção majoritária
-  v_qtd_especies_origem NUMBER; -- Variável para armazenar a quantidade de espécies que tiveram origem no planeta
+    TYPE PlanetInfoType IS RECORD (
+        PlanetaID VARCHAR2(15),
+        NacaoDominante VARCHAR2(15),
+        DataInicioDom DATE,
+        DataFimDom DATE,
+        QtdComunidades NUMBER,
+        QtdEspecies NUMBER,
+        QtdHabitantes NUMBER,
+        QtdFaccoes NUMBER,
+        FaccaoMajoritaria VARCHAR2(15),
+        QtdEspeciesOrigem NUMBER
+    );
+    
+    TYPE PlanetInfoTableType IS TABLE OF PlanetInfoType INDEX BY PLS_INTEGER;
+
+    PlanetInfo PlanetInfoTableType;
 BEGIN
-  -- Coleta de dados dos planetas
-  SELECT * BULK COLLECT INTO v_planeta_info FROM PLANETA; -- Usa BULK COLLECT para coletar todos os dados dos planetas de uma vez
-
-  -- Loop através dos planetas
-  FOR v_index IN 1..v_planeta_info.COUNT LOOP
-    BEGIN
-      -- Coleta de informações do planeta
-      SELECT NACAO, DATA_INI, DATA_FIM INTO v_nacao_dominante, v_data_ini, v_data_fim
-      FROM DOMINANCIA
-      WHERE PLANETA = v_planeta_info(v_index).ID_ASTRO
-      AND DATA_FIM IS NULL; -- Seleciona a nação dominante atual e as datas de início e fim da dominação
-
-      SELECT COUNT(*) INTO v_qtd_comunidades
-      FROM COMUNIDADE
-      WHERE ESPECIE IN (SELECT NOME FROM ESPECIE WHERE PLANETA_OR = v_planeta_info(v_index).ID_ASTRO); -- Conta a quantidade de comunidades
-
-      SELECT COUNT(DISTINCT ESPECIE), SUM(QTD_HABITANTES) INTO v_qtd_especies, v_qtd_habitantes
-      FROM COMUNIDADE
-      WHERE ESPECIE IN (SELECT NOME FROM ESPECIE WHERE PLANETA_OR = v_planeta_info(v_index).ID_ASTRO); -- Conta a quantidade de espécies e habitantes
-
-      SELECT COUNT(DISTINCT FACCAO) INTO v_qtd_faccoes
-      FROM PARTICIPA
-      WHERE ESPECIE IN (SELECT NOME FROM ESPECIE WHERE PLANETA_OR = v_planeta_info(v_index).ID_ASTRO); -- Conta a quantidade de facções
-
-      SELECT FACCAO INTO v_facao_majoritaria
-      FROM PARTICIPA
-      WHERE ESPECIE IN (SELECT NOME FROM ESPECIE WHERE PLANETA_OR = v_planeta_info(v_index).ID_ASTRO)
-      GROUP BY FACCAO
-      ORDER BY COUNT(*) DESC
-      FETCH FIRST ROW ONLY; -- Seleciona a facção majoritária
-
-      SELECT COUNT(*) INTO v_qtd_especies_origem
-      FROM ESPECIE
-      WHERE PLANETA_OR = v_planeta_info(v_index).ID_ASTRO; -- Conta a quantidade de espécies que tiveram origem no planeta
-
-      -- Impressão das informações
-      DBMS_OUTPUT.PUT_LINE('Planeta: ' || v_planeta_info(v_index).ID_ASTRO);
-      DBMS_OUTPUT.PUT_LINE('Nação dominante atual: ' || v_nacao_dominante);
-      DBMS_OUTPUT.PUT_LINE('Data de início da última dominação: ' || v_data_ini);
-      DBMS_OUTPUT.PUT_LINE('Data de fim da última dominação: ' || v_data_fim);
-      DBMS_OUTPUT.PUT_LINE('Quantidade de comunidades: ' || v_qtd_comunidades);
-      DBMS_OUTPUT.PUT_LINE('Quantidade de espécies: ' || v_qtd_especies);
-      DBMS_OUTPUT.PUT_LINE('Quantidade de habitantes: ' || v_qtd_habitantes);
-      DBMS_OUTPUT.PUT_LINE('Quantidade de facções: ' || v_qtd_faccoes);
-      DBMS_OUTPUT.PUT_LINE('Facção majoritária: ' || v_facao_majoritaria);
-      DBMS_OUTPUT.PUT_LINE('Quantidade de espécies que tiveram origem no planeta: ' || v_qtd_especies_origem);
-      DBMS_OUTPUT.PUT_LINE('----------------------------------------------');
-    EXCEPTION
-      -- Tratamento de exceções
-      WHEN NO_DATA_FOUND THEN
-        DBMS_OUTPUT.PUT_LINE('Nenhuma informação encontrada para o planeta: ' || v_planeta_info(v_index).ID_ASTRO); -- Imprime uma mensagem se não houver informações para o planeta
-      WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Erro ao processar o planeta: ' || v_planeta_info(v_index).ID_ASTRO); -- Imprime uma mensagem se ocorrer um erro ao processar o planeta
-        DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM); -- Imprime a mensagem de erro
-    END;
-  END LOOP;
-EXCEPTION
-  WHEN OTHERS THEN
-    DBMS_OUTPUT.PUT_LINE('Erro ao executar o programa PL/SQL'); -- Imprime uma mensagem se ocorrer um erro ao executar o programa
-    DBMS_OUTPUT.PUT_LINE('Erro: ' || SQLERRM); -- Imprime a mensagem de erro
+    FOR PlanetRec IN (SELECT p.ID_ASTRO AS PlanetaID,
+                              d.NACAO AS NacaoDominante,
+                              d.DATA_INI AS DataInicioDom,
+                              d.DATA_FIM AS DataFimDom,
+                              (SELECT COUNT(*) FROM HABITACAO h WHERE h.PLANETA = p.ID_ASTRO) AS QtdComunidades,
+                              (SELECT COUNT(DISTINCT e.ESPECIE) FROM HABITACAO e WHERE e.PLANETA = p.ID_ASTRO) AS QtdEspecies,
+                              (SELECT SUM(c.QTD_HABITANTES) FROM COMUNIDADE c WHERE c.ESPECIE IN (SELECT DISTINCT h.ESPECIE FROM HABITACAO h WHERE h.PLANETA = p.ID_ASTRO)) AS QtdHabitantes,
+                              (SELECT COUNT(DISTINCT f.FACCAO) FROM PARTICIPA f JOIN FACCAO fac ON f.FACCAO = fac.NOME) AS QtdFaccoes,
+                              (SELECT f.NOME FROM NACAO n JOIN NACAO_FACCAO nf ON n.NOME = nf.NACAO JOIN FACCAO f ON nf.FACCAO = f.NOME WHERE n.NOME = d.NACAO GROUP BY f.NOME ORDER BY COUNT(*) DESC FETCH FIRST 1 ROW ONLY) AS FaccaoMajoritaria,
+                              (SELECT COUNT(DISTINCT e.NOME) FROM ESPECIE e WHERE e.PLANETA_OR = p.ID_ASTRO) AS QtdEspeciesOrigem
+                       FROM PLANETA p
+                       LEFT JOIN DOMINANCIA d ON p.ID_ASTRO = d.PLANETA
+                       WHERE p.ID_ASTRO IS NOT NULL)
+    LOOP
+        PlanetInfo(PlanetInfo.COUNT + 1).PlanetaID := PlanetRec.PlanetaID;
+        PlanetInfo(PlanetInfo.COUNT).NacaoDominante := PlanetRec.NacaoDominante;
+        PlanetInfo(PlanetInfo.COUNT).DataInicioDom := PlanetRec.DataInicioDom;
+        PlanetInfo(PlanetInfo.COUNT).DataFimDom := PlanetRec.DataFimDom;
+        PlanetInfo(PlanetInfo.COUNT).QtdComunidades := PlanetRec.QtdComunidades;
+        PlanetInfo(PlanetInfo.COUNT).QtdEspecies := PlanetRec.QtdEspecies;
+        PlanetInfo(PlanetInfo.COUNT).QtdHabitantes := PlanetRec.QtdHabitantes;
+        PlanetInfo(PlanetInfo.COUNT).QtdFaccoes := PlanetRec.QtdFaccoes;
+        PlanetInfo(PlanetInfo.COUNT).FaccaoMajoritaria := PlanetRec.FaccaoMajoritaria;
+        PlanetInfo(PlanetInfo.COUNT).QtdEspeciesOrigem := PlanetRec.QtdEspeciesOrigem;
+    END LOOP;
+    
+    FOR i IN 1..PlanetInfo.COUNT LOOP
+        DBMS_OUTPUT.PUT_LINE('Planeta: ' || PlanetInfo(i).PlanetaID);
+        DBMS_OUTPUT.PUT_LINE('Nação Dominante: ' || NVL(PlanetInfo(i).NacaoDominante, 'Nenhuma'));
+        DBMS_OUTPUT.PUT_LINE('Data de Início da Última Dominação: ' || NVL(TO_CHAR(PlanetInfo(i).DataInicioDom, 'DD/MM/YYYY'), 'N/A'));
+        DBMS_OUTPUT.PUT_LINE('Data de Fim da Última Dominação: ' || NVL(TO_CHAR(PlanetInfo(i).DataFimDom, 'DD/MM/YYYY'), 'N/A'));
+        DBMS_OUTPUT.PUT_LINE('Quantidade de Comunidades: ' || PlanetInfo(i).QtdComunidades);
+        DBMS_OUTPUT.PUT_LINE('Quantidade de Espécies: ' || PlanetInfo(i).QtdEspecies);
+        DBMS_OUTPUT.PUT_LINE('Quantidade de Habitantes: ' || PlanetInfo(i).QtdHabitantes);
+        DBMS_OUTPUT.PUT_LINE('Quantidade de Facções: ' || PlanetInfo(i).QtdFaccoes);
+        DBMS_OUTPUT.PUT_LINE('Facção Majoritária: ' || NVL(PlanetInfo(i).FaccaoMajoritaria, 'Nenhuma'));
+        DBMS_OUTPUT.PUT_LINE('Quantidade de Espécies de Origem: ' || PlanetInfo(i).QtdEspeciesOrigem);
+        DBMS_OUTPUT.PUT_LINE(' ');
+    END LOOP;
 END;
-/
+
+/* SAÍDA DBMS (alguns exemplos, já que a saída é muito grande)
+
+Planeta: 11 Com b
+Nação Dominante: Ducimus odio.
+Data de Início da Última Dominação: 01/01/2000
+Data de Fim da Última Dominação: N/A
+Quantidade de Comunidades: 3
+Quantidade de Espécies: 3
+Quantidade de Habitantes: 1400
+Quantidade de Facções: 2
+Facção Majoritária: Prog Celestiais
+Quantidade de Espécies de Origem: 0
+ 
+Planeta: 11 Oph b
+Nação Dominante: Ducimus odio.
+Data de Início da Última Dominação: 01/01/2001
+Data de Fim da Última Dominação: N/A
+Quantidade de Comunidades: 1
+Quantidade de Espécies: 1
+Quantidade de Habitantes: 300
+Quantidade de Facções: 2
+Facção Majoritária: Prog Celestiais
+Quantidade de Espécies de Origem: 1
+ 
+Planeta: 11 Oph b
+Nação Dominante: Quam quia ad.
+Data de Início da Última Dominação: 01/01/2002
+Data de Fim da Última Dominação: N/A
+Quantidade de Comunidades: 1
+Quantidade de Espécies: 1
+Quantidade de Habitantes: 300
+Quantidade de Facções: 2
+Facção Majoritária: Prog Celestiais
+Quantidade de Espécies de Origem: 1
+ 
+Planeta: 11 UMi b
+Nação Dominante: Veniam est.
+Data de Início da Última Dominação: 01/01/2003
+Data de Fim da Última Dominação: N/A
+Quantidade de Comunidades: 1
+Quantidade de Espécies: 1
+Quantidade de Habitantes: 3400
+Quantidade de Facções: 2
+Facção Majoritária: Cons Cósmicos
+Quantidade de Espécies de Origem: 0
+
+*/
+
+
