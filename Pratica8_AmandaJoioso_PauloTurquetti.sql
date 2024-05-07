@@ -81,6 +81,8 @@ BEGIN
         T_COMUNIDADE(T_COMUNIDADE.LAST) := R_COMUNIDADE;
     END LOOP;
 
+    IF T_COMUNIDADE.COUNT = 0 THEN
+
     
     DBMS_OUTPUT.PUT_LINE('Inserindo em PARTICIPA:');
     FOR I_INDEX IN T_COMUNIDADE.FIRST..T_COMUNIDADE.LAST
@@ -94,6 +96,15 @@ BEGIN
 
     END LOOP;
     COMMIT;
+
+EXCEPTION
+    -- Captura de exceções gerais
+    WHEN OTHERS THEN
+        -- Exibição de mensagem de erro
+        DBMS_OUTPUT.PUT_LINE('Erro durante a execução do bloco PL/SQL:');
+        DBMS_OUTPUT.PUT_LINE(SQLERRM);
+        -- Rollback da transação
+        ROLLBACK;
 END;
 
 /* RESULTADOS:
