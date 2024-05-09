@@ -61,6 +61,9 @@ END;
 
 
 -- QUESTÃO 2 --------------------------------------------------------------------------------------------
+
+
+-- FUNÇÃO
 create or replace FUNCTION REMOVE_NACAO_FACCAO(V_FAC NACAO_FACCAO.FACCAO%TYPE, 
                                                 V_NAC NACAO_FACCAO.NACAO%TYPE)
                                                RETURN NUMBER IS
@@ -89,3 +92,5 @@ create or replace FUNCTION REMOVE_NACAO_FACCAO(V_FAC NACAO_FACCAO.FACCAO%TYPE,
         V_RESULTADO := 1;
         RETURN V_RESULTADO;
     END;
+
+-- CODIGO CHAMANDO A FUNCAO
