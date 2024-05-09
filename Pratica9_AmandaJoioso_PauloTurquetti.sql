@@ -55,3 +55,37 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('Distancia entre as estrelas: ' || V_DISTANCIA);
 END;
+
+
+
+
+
+-- QUESTÃO 2 --------------------------------------------------------------------------------------------
+create or replace FUNCTION REMOVE_NACAO_FACCAO(V_FAC NACAO_FACCAO.FACCAO%TYPE, 
+                                                V_NAC NACAO_FACCAO.NACAO%TYPE)
+                                               RETURN NUMBER IS
+                                                
+    V_RESULTADO NUMBER;
+    V_NACAO_FACCAO_TUPLA NACAO_FACCAO%ROWTYPE;
+
+    BEGIN
+
+    SELECT * INTO V_NACAO_FACCAO_TUPLA FROM NACAO_FACCAO WHERE NACAO_FACCAO.FACCAO = V_FAC 
+                                                            AND NACAO_FACCAO.NACAO = V_NAC;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Nao foi encontrada nenhuma tupla NACAO_FACCAO correspondente');
+            RETURN V_RESULTADO;
+
+        DELETE FROM NACAO_FACCAO WHERE NACAO_FACCAO.FACCAO = V_NACAO_FACCAO_TUPLA.FACCAO 
+                                    AND NACAO_FACCAO.NACAO = V_NACAO_FACCAO_TUPLA.NACAO;
+
+        DBMS_OUTPUT.PUT_LINE('Tupla de NACAO_FACCAO removida: ');
+        DBMS_OUTPUT.PUT_LINE('Faccao: ' || V_NACAO_FACCAO_TUPLA.FACCAO || '  Nacao: ' || V_NACAO_FACCAO_TUPLA.NACAO);
+        DBMS_OUTPUT.PUT_LINE('-----------------------------------------------------');
+
+        COMMIT;
+        V_RESULTADO := 1;
+        RETURN V_RESULTADO;
+    END;
