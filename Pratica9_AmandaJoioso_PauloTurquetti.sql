@@ -94,3 +94,8 @@ create or replace FUNCTION REMOVE_NACAO_FACCAO(V_FAC NACAO_FACCAO.FACCAO%TYPE,
     END;
 
 -- CODIGO CHAMANDO A FUNCAO
+
+
+-- QUESTÃO 3 --------------------------------------------------------------------------------------
+
+
