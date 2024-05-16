@@ -146,3 +146,8 @@ Veniam est.	        Cons Cósmicos
 -- QUESTÃO 3 --------------------------------------------------------------------------------------
 
 
+SELECT OP.ESTRELA FROM
+DOMINANCIA D JOIN PLANETA P ON D.PLANETA = P.ID_ASTRO
+JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA
+WHERE D.NACAO = 'Quo labore.';
+
