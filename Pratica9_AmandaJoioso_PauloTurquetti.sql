@@ -82,48 +82,52 @@ INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Vel rerum unde.', 'Prog Celest
 INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Ducimus odio.', 'Prog Celestiais');
 INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Veniam est.', 'Prog e Além');
 
--- FUNÇÃO
-CREATE OR REPLACE FUNCTION REMOVE_NACAO_FACCAO(
-    V_FAC NACAO_FACCAO.FACCAO%TYPE, 
-    V_NAC NACAO_FACCAO.NACAO%TYPE
-) RETURN NUMBER IS
-    V_RESULTADO NUMBER := 0; -- Inicialize para indicar falha
-BEGIN
-    DELETE FROM NACAO_FACCAO 
-    WHERE FACCAO = V_FAC AND NACAO = V_NAC;
-    
-    -- Verifique se alguma linha foi afetada pela operação de exclusão
-    IF SQL%ROWCOUNT > 0 THEN
-        V_RESULTADO := 1; -- Indica sucesso
-    END IF;
-    
-    RETURN V_RESULTADO;
-END;
+-- Criacao do pacote
+CREATE OR REPLACE PACKAGE FUNCIONALIDADES_LIDER AS
+    PROCEDURE REMOVE_NACAO_FACCAO(
+        V_FAC NACAO_FACCAO.FACCAO%TYPE, 
+        V_NAC NACAO_FACCAO.NACAO%TYPE
+    );
+END FUNCIONALIDADES_LIDER;
+
+-- Criando corpo do pacote
+CREATE OR REPLACE PACKAGE BODY FUNCIONALIDADES_LIDER AS
+    PROCEDURE REMOVE_NACAO_FACCAO(
+        V_FAC NACAO_FACCAO.FACCAO%TYPE, 
+        V_NAC NACAO_FACCAO.NACAO%TYPE
+    ) AS
+    BEGIN
+        DELETE FROM NACAO_FACCAO 
+        WHERE FACCAO = V_FAC AND NACAO = V_NAC;
+        
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Nenhuma linha encontrada para deletar.');
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Ocorreu um erro: ' || SQLERRM);
+    END;
+END FUNCIONALIDADES_LIDER;
 
 
-    
-    
+
+-- Código para execucao das funcionalidades do pacote
 DECLARE
-    V_NACAO_FACCAO NACAO_FACCAO%ROWTYPE;
-    V_NAC NACAO.NOME%TYPE := 'Veniam est.';
-    V_FAC FACCAO.NOME%TYPE := 'Prog e Além';
+    v_fac NACAO_FACCAO.FACCAO%TYPE := 'Prog e Além';
+    v_nac NACAO_FACCAO.NACAO%TYPE := 'Veniam est.';
 BEGIN
-    -- Consulta para obter os detalhes da relação entre a facção e a nação
-    SELECT * INTO V_NACAO_FACCAO 
-    FROM NACAO_FACCAO 
-    WHERE FACCAO = V_FAC AND NACAO = V_NAC;
-    
-    -- Chama a função para remover a relação
-    IF REMOVE_NACAO_FACCAO(V_NACAO_FACCAO.FACCAO, V_NACAO_FACCAO.NACAO) = 1 THEN
-        DBMS_OUTPUT.PUT_LINE('Relação removida com sucesso.');
-    ELSE
-        DBMS_OUTPUT.PUT_LINE('Falha ao remover a relação.');
-    END IF;
+    FUNCIONALIDADES_LIDER.REMOVE_NACAO_FACCAO(v_fac, v_nac);
+    DBMS_OUTPUT.PUT_LINE('Procedimento executado com sucesso.');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erro ao executar o procedimento');
 END;
+
+
+
 
 
 /*
-
+ - Antes da execucao
 NACAO               FACCAO
 Ducimus odio.	      Prog Celestiais
 Modi porro ut.	    Prog e Além
@@ -132,7 +136,7 @@ Vel rerum unde.	    Prog Celestiais
 Veniam est.	        Cons Cósmicos
 Veniam est.	        Prog e Além
 
-
+ - Depois da execucao
 NACAO               FACCAO
 Ducimus odio.	      Prog Celestiais
 Modi porro ut.	    Prog e Além
