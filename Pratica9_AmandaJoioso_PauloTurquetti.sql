@@ -356,13 +356,7 @@ END;
 
 -- b)
 
-
-INSERT INTO ORBITA_ESTRELA(ORBITANTE, ORBITADA) VALUES ('Alasia', 'Aiolos');
-INSERT INTO ORBITA_ESTRELA(ORBITANTE, ORBITADA) VALUES ('Alp Ant', 'Aiolos');
-INSERT INTO ORBITA_ESTRELA(ORBITANTE, ORBITADA) VALUES ('Alp Ara', 'Alp Aps');
-INSERT INTO ORBITA_ESTRELA(ORBITANTE, ORBITADA) VALUES ('Alp Car', 'Alp Aps');
-INSERT INTO ORBITA_ESTRELA(ORBITANTE, ORBITADA) VALUES ('Alp CrA', 'Alp Col');
-
+-- INSERCAO DE DADOS PARA TESTE
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Nihil deserunt.', '7Zet1CrB', 0.3, 0.4, 30);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Quae possimus.', '7Zet1CrB', 1.8, 2, 160);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('In magni quas.', '7Zet1CrB', 2.3, 3, 510);
@@ -424,17 +418,84 @@ CREATE OR REPLACE PACKAGE BODY FUNCIONALIDADES_CIENTISTA AS
 END FUNCIONALIDADES_CIENTISTA;
 
 
--- CODIGO PL/SQL PARA TESTES
+-- CODIGO PL/SQL PARA TESTE DE GERAR_RELATORIO
 DECLARE
+    V_ID_ESTRELA ESTRELA.ID_ESTRELA%TYPE := '7Zet1CrB';
     V_ESTRELA ESTRELA%ROWTYPE;
+    
 BEGIN    
     -- GERANDO RELATORIO 
-    SELECT INTO V_ESTRELA FROM ESTRELA WHERE ID_ESTRELA = '7Zet1CrB';
+    SELECT * INTO V_ESTRELA FROM ESTRELA WHERE ID_ESTRELA = V_ID_ESTRELA;
     FUNCIONALIDADES_CIENTISTA.GERAR_RELATORIO(V_ESTRELA);
 
 END;
 
-SELECT * FROM ORBITA_PLANETA;
+/* Resultado - SAÍDA DBMS
 
+--- GERANDO INFOS DA ESTRELA ---
+Id: 7Zet1CrB
+Nome: 
+Classificacao: B7V+...
+Massa: 255,6230427112548
+Coordenadas X -67,060303 Y -95,220854 Z 86,607536
+
+A estrela 7Zet1CrB configura o seguinte sistema solar:
+Planeta: WD 1856+534 b
+Massa: 
+Raio: ,928
+Classificacao: Confirmed
+Orbita na estrela 
+Distância mínima: ,3
+Distância máxima: 2
+Período: 30
+-----------
+Planeta: Nihil deserunt.
+Massa: 41563,31
+Raio: 55325,85
+Classificacao: Iste reprehenderit ratione qui.
+Orbita na estrela 
+Distância mínima: ,3
+Distância máxima: ,4
+Período: 30
+-----------
+Planeta: Quae possimus.
+Massa: 46992,34
+Raio: 54123
+Classificacao: In perspiciatis soluta.
+Orbita na estrela 
+Distância mínima: 1,8
+Distância máxima: 2
+Período: 160
+-----------
+Planeta: In magni quas.
+Massa: 6510,15
+Raio: 97746,96
+Classificacao: Error repellat quisquam molestias.
+Orbita na estrela 
+Distância mínima: 2,3
+Distância máxima: 3
+Período: 510
+-----------
+Planeta: At molestiae.
+Massa: 87036,25
+Raio: 31742,2
+Classificacao: Iste impedit fugiat optio.
+Orbita na estrela 
+Distância mínima: 4,7
+Distância máxima: 4,8
+Período: 780
+-----------
+Planeta: Modi sit harum.
+Massa: 16616,73
+Raio: 95243,45
+Classificacao: Hic perferendis ut fuga. Perferendis culpa esse.
+Orbita na estrela 
+Distância mínima: 5,1
+Distância máxima: 5,3
+Período: 220
+-----------
+
+
+*/
 
 
