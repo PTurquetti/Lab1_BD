@@ -15,5 +15,3 @@ Paulo Henrique Vedovatto Turquetti - 13750791
 
 
 
-
-
