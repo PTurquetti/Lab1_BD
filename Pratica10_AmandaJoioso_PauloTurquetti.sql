@@ -1,4 +1,4 @@
-/* Pratica 9
+/* Pratica 10
 
 Amanda Valukas Breviglieri Joioso - 4818232
 Paulo Henrique Vedovatto Turquetti - 13750791
@@ -81,6 +81,10 @@ END;
 
 /* ANALISANDO
 
+De acordo com a implementação dos relacionamentos entre as tabelas envolvidas nesse caso, percebemos que as inserções
+de dados consistentes deverão obrigatoriamente seguir a odem NACAO -> LIDER -> FACCAO -> NACAO_FACCAO. Por isso, optamos por
+verificar a consistencia de LIDER.NACAO e NACAO_FACCAO.NACAO antes de cada inserção ou update na tabela NACAO_FACCAO. Isso irá garantir
+que a nação do lider seja controlada por uma faccao que ele comanda
 
 */
 
