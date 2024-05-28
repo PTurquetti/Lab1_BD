@@ -73,31 +73,20 @@ SELECT L.CPI AS CPI_LIDER, L.NACAO AS NACAO_LIDER, NF.NACAO AS NACAO_DA_FACCAO F
     WHERE L.NACAO = NF.NACAO;
     
     
-CREATE OR REPLACE TRIGGER LIDER_FACCAO_NACAO
-AFTER INSERT OR UPDATE ON LIDER
+CREATE OR REPLACE TRIGGER LIDER_NACAO_FACCAO
+BEFORE INSERT OR UPDATE ON NACAO_FACCAO
 FOR EACH ROW
 DECLARE
-    v_count INTEGER;
+    V_COUNT INTEGER;
 BEGIN
-    -- Verifica se o líder está associado a uma facção
-    SELECT COUNT(*)
-    INTO v_count
-    FROM FACCAO
-    WHERE LIDER = :NEW.CPI;
+    -- VERIFICA SE O LIDER VEM DE UMA NACAO DOMINADA PELA FACCAO QUE CONTROLA
+    SELECT COUNT(*) INTO V_COUNT FROM 
+        LIDER L JOIN FACCAO F ON L.CPI = F.LIDER
+        JOIN NACAO_FACCAO NF ON NF.FACCAO = F.NOME
+        WHERE :NEW.NACAO = NF.NACAO;
 
-    -- Se o líder estiver associado a uma facção, verifica a nação
-    IF v_count > 0 THEN
-        -- Verifica se a nação do líder está associada a uma facção presente
-        SELECT COUNT(*)
-        INTO v_count
-        FROM FACCAO F
-        JOIN NACAO_FACCAO NF ON F.NOME = NF.FACCAO
-        WHERE F.LIDER = :NEW.CPI
-          AND NF.NACAO = :NEW.NACAO;
-
-        -- Se a contagem for zero, lança uma exceção
-        IF v_count = 0 THEN
-            RAISE_APPLICATION_ERROR(-20001, 'O líder deve estar associado a uma nação em que a facção está presente.');
-        END IF;
+    -- SE 0, LIDER NAO EH DE NACAO DOMINADA PELA FACCAO
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'O líder da facção deve estar associado à nação em que a facção está presente.');
     END IF;
 END;
