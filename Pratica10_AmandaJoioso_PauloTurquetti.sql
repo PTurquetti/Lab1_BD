@@ -62,17 +62,6 @@ DELETE FROM FEDERACAO WHERE NOME = 'MAIS NOVA';
 
 
 -- b)O líder de uma facção deve estar associado a uma nação em	que	a facção está presente.	
-
-SELECT * FROM FACCAO;
-SELECT * FROM LIDER;
-SELECT * FROM NACAO;
-
-SELECT L.CPI AS CPI_LIDER, L.NACAO AS NACAO_LIDER, NF.NACAO AS NACAO_DA_FACCAO FROM 
-    LIDER L JOIN FACCAO F ON L.CPI = F.LIDER
-    JOIN NACAO_FACCAO NF ON NF.FACCAO = F.NOME
-    WHERE L.NACAO = NF.NACAO;
-    
-    
 CREATE OR REPLACE TRIGGER LIDER_NACAO_FACCAO
 BEFORE INSERT OR UPDATE ON NACAO_FACCAO
 FOR EACH ROW
@@ -82,11 +71,65 @@ BEGIN
     -- VERIFICA SE O LIDER VEM DE UMA NACAO DOMINADA PELA FACCAO QUE CONTROLA
     SELECT COUNT(*) INTO V_COUNT FROM 
         LIDER L JOIN FACCAO F ON L.CPI = F.LIDER
-        JOIN NACAO_FACCAO NF ON NF.FACCAO = F.NOME
-        WHERE :NEW.NACAO = NF.NACAO;
+        WHERE :NEW.NACAO = L.NACAO;
 
     -- SE 0, LIDER NAO EH DE NACAO DOMINADA PELA FACCAO
     IF v_count = 0 THEN
         RAISE_APPLICATION_ERROR(-20001, 'O líder da facção deve estar associado à nação em que a facção está presente.');
     END IF;
 END;
+
+/* ANALISANDO
+
+
+*/
+
+--INSERCAO DE DADOS PARA TESTE
+
+-- Caso 1 - Insercões de dados que cumprem o requisito - LIDER.NACAO = NACAO_FACCAO.NACAO
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('111.111.111-11', 'Capitã Aria No', 'CIENTISTA', 'Quam quia ad.', 'Quidem quam');
+INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Prog Celestiais', '111.111.111-11', 'PROGRESSITA', 3);
+INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Quam quia ad.', 'Prog Celestiais');
+-- A inserção da tupla de NAÇÃO_FACCAO foi permitida
+
+-- Caso 2 - Inserção de dados que não cumprem o requisito - LIDER.NACAO != NACAO_FACCAO.NACAO
+INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('222.222.222-22', 'General Zorg', 'COMANDANTE', 'Veniam est.', 'Unde eius at');
+INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Cons Cósmicos', '222.222.222-22', 'TRADICIONALISTA', NULL);
+INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Modi porro ut.', 'Cons Cósmicos');
+
+/*
+Erro a partir da linha : 11 no comando -
+UPDATE NACAO_FACCAO SET NACAO = 'Vel rerum unde.' WHERE FACCAO = 'Prog Celestiais'
+Erro na Linha de Comandos : 11 Coluna : 8
+Relatório de erros -
+Erro de SQL: ORA-20001: O líder da facção deve estar associado à nação em que a facção está presente.
+ORA-06512: em "A13750791.LIDER_NACAO_FACCAO", line 11
+ORA-04088: erro durante a execução do gatilho 'A13750791.LIDER_NACAO_FACCAO'
+
+OBS: Recebemos o bloqueio esperado!
+*/
+
+-- Caso 3 - Update de NACAO_FACCAO fazendo com que o requisito não seja mais cumprido - LIDER.NACAO != :NEW.NACAO
+UPDATE NACAO_FACCAO SET NACAO = 'Vel rerum unde.' WHERE FACCAO = 'Prog Celestiais';
+/*
+Erro a partir da linha : 11 no comando -
+UPDATE NACAO_FACCAO SET NACAO = 'Vel rerum unde.' WHERE FACCAO = 'Prog Celestiais'
+Erro na Linha de Comandos : 11 Coluna : 8
+Relatório de erros -
+Erro de SQL: ORA-20001: O líder da facção deve estar associado à nação em que a facção está presente.
+ORA-06512: em "A13750791.LIDER_NACAO_FACCAO", line 11
+ORA-04088: erro durante a execução do gatilho 'A13750791.LIDER_NACAO_FACCAO'
+
+OBS: Recebemos o bloqueio esperado!
+
+SELECT * FROM NACAO_FACCAO;
+Quam quia ad.	Prog Celestiais
+
+Vemos que a operacao UPDATE não foi realizada
+/*
+
+
+
+
+
+
