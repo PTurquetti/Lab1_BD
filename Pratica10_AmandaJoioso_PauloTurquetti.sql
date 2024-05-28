@@ -130,12 +130,19 @@ SELECT * FROM NACAO_FACCAO;
 Quam quia ad.	Prog Celestiais
 
 Vemos que a operacao UPDATE não foi realizada
-/*
+*/
 
 
 
---c) A	quantidade	de	nações,	na	tabela	Faccao dever	estar	sempre	atualizada.	
+-- c) A	quantidade	de	nações,	na	tabela	Faccao dever	estar	sempre	atualizada.	
 
+CREATE OR REPLACE TRIGGER FACCAO_QTDNACOES
+AFTER INSERT OR UPDATE OR DELETE ON NACAO_FACCAO
+BEGIN
+    -- Atualiza a quantidade de nações na tabela FACCAO
+    UPDATE FACCAO F
+    SET QTD_NACOES = (SELECT COUNT(*) FROM NACAO_FACCAO NF WHERE NF.FACCAO = F.NOME);
+END;
 
 
 
