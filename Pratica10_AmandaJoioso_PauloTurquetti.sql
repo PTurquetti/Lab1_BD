@@ -61,7 +61,7 @@ DELETE FROM FEDERACAO WHERE NOME = 'MAIS NOVA';
 
 
 
--- b) O líder de uma facção deve estar associado a uma nação em	que	a facção está presente.	
+-- b)O líder de uma facção deve estar associado a uma nação em	que	a facção está presente.	
 
 SELECT * FROM FACCAO;
 SELECT * FROM LIDER;
@@ -73,7 +73,7 @@ SELECT L.CPI AS CPI_LIDER, L.NACAO AS NACAO_LIDER, NF.NACAO AS NACAO_DA_FACCAO F
     WHERE L.NACAO = NF.NACAO;
     
     
-CREATE OR REPLACE TRIGGER trg_lider_faccao_nacao
+CREATE OR REPLACE TRIGGER LIDER_FACCAO_NACAO
 AFTER INSERT OR UPDATE ON LIDER
 FOR EACH ROW
 DECLARE
@@ -101,8 +101,3 @@ BEGIN
         END IF;
     END IF;
 END;
-
-
-
-
-
