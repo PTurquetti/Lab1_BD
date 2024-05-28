@@ -63,6 +63,34 @@ DELETE FROM FEDERACAO WHERE NOME = 'MAIS NOVA';
 
 -- b) O	líder de uma facção	deve estar associado a uma nação em	que	a facção está presente.	
 
+/* Consulta que mostra lideres associados a uma nacao em que a facção está fresente:
+
+SELECT L.CPI AS CPI_LIDER, L.NACAO AS NACAO_LIDER, NF.NACAO AS NACAO_DA_FACCAO FROM 
+    LIDER L JOIN FACCAO F ON L.CPI = F.LIDER
+    JOIN NACAO_FACCAO NF ON NF.FACCAO = F.NOME
+    WHERE L.NACAO = NF.NACAO;
+
+*/
+
+CREATE OR REPLACE TRIGGER trg_lider_faccao_nacao
+AFTER INSERT OR UPDATE ON LIDER
+FOR EACH ROW
+DECLARE
+    v_count INTEGER;
+BEGIN
+    -- Verifica se o líder está associado a uma nação em que a facção está presente
+    SELECT COUNT(*)
+    INTO v_count
+    FROM FACCAO F
+    JOIN NACAO_FACCAO NF ON F.NOME = NF.FACCAO
+    WHERE F.LIDER = :NEW.CPI
+      AND NF.NACAO = :NEW.NACAO;
+    
+    -- Se a contagem for zero, lança uma exceção
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'O líder deve estar associado a uma nação em que a facção está presente.');
+    END IF;
+END;
 
 
 
