@@ -134,6 +134,10 @@ Vemos que a operacao UPDATE não foi realizada
 
 
 
+--c) A	quantidade	de	nações,	na	tabela	Faccao dever	estar	sempre	atualizada.	
+
+
+
 
 
 
