@@ -144,6 +144,63 @@ BEGIN
     SET QTD_NACOES = (SELECT COUNT(*) FROM NACAO_FACCAO NF WHERE NF.FACCAO = F.NOME);
 END;
 
+-- Insercao de dados para teste
+
+-- Inserindo lideres para cumprir FK de faccao
+    INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('111.111.111-11', 'Capitã Aria No', 'CIENTISTA', 'Quam quia ad.', 'Quidem quam');
+    INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('222.222.222-22', 'General Zorg', 'COMANDANTE', 'Veniam est.', 'Unde eius at');
+    INSERT INTO LIDER (CPI, NOME, CARGO, NACAO, ESPECIE) VALUES ('333.333.333-33', 'Buzz Lightyear', 'OFICIAL', 'Modi porro ut.', 'Iure sunt quas');
+
+-- Inserindo faccoes com valor null em qtd_nacoes
+    INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Prog Celestiais', '111.111.111-11', 'PROGRESSITA', NULL);
+    INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Cons Cósmicos', '222.222.222-22', 'TRADICIONALISTA', NULL);
+    INSERT INTO FACCAO (NOME, LIDER, IDEOLOGIA, QTD_NACOES) VALUES ('Prog e Além', '333.333.333-33', 'PROGRESSITA', NULL);
+
+
+-- buscando quantidade de nacoes de cada faccao
+    SELECT NOME, QTD_NACOES FROM FACCAO;
+
+/*
+NOME             QTD_NACOES
+Prog Celestiais	    0
+Cons Cósmicos	    0
+Prog e Além	        0
+*/
+
+-- Inserindo dados em NACAO_FACCAO
+    INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Quam quia ad.', 'Prog Celestiais');
+    INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Veniam est.', 'Cons Cósmicos');
+    INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Modi porro ut.', 'Prog e Além');
+    INSERT INTO NACAO_FACCAO (NACAO, FACCAO) VALUES ('Veniam est.', 'Prog e Além');
+
+-- Nova busca
+    SELECT NOME, QTD_NACOES FROM FACCAO;
+
+/*
+NOME             QTD_NACOES
+Prog Celestiais	    1
+Cons Cósmicos	    1
+Prog e Além	        2
+*/
+
+-- Deletando dados de NACAO_FACAO
+DELETE FROM NACAO_FACCAO;
+-- buscando quantidade de nacoes de cada faccao
+    SELECT NOME, QTD_NACOES FROM FACCAO;
+
+/*
+NOME             QTD_NACOES
+Prog Celestiais	    0
+Cons Cósmicos	    0
+Prog e Além	        0
+*/
+
+
+
+
+
+
+
 
 
 
