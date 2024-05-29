@@ -198,6 +198,10 @@ Prog e Além	        0
 
 
 
+-- d) Na tabela Nacao, o atributo qtd_planetas deve considerar somente dominâncias atuais.
+
+
+
 
 
 
