@@ -199,7 +199,48 @@ Prog e Além	        0
 
 
 -- d) Na tabela Nacao, o atributo qtd_planetas deve considerar somente dominâncias atuais.
+CREATE OR REPLACE TRIGGER NACAO_QTDPLANETAS
+AFTER INSERT OR UPDATE OR DELETE ON DOMINANCIA
+BEGIN
+    -- Atualiza a quantidade de nações na tabela FACCAO
+    UPDATE NACAO N
+    SET QTD_PLANETAS = (SELECT COUNT(*) FROM DOMINANCIA WHERE NACAO = N.NOME AND DATA_FIM IS NULL);
+END;
 
+
+
+-- Inserindo dados para teste do trigger
+INSERT INTO DOMINANCIA (PLANETA, NACAO, DATA_INI, DATA_FIM) VALUES ('Quae possimus.', 'Quo labore.', TO_DATE('2021-10-28', 'YYYY-MM-DD'), NULL);
+INSERT INTO DOMINANCIA (PLANETA, NACAO, DATA_INI, DATA_FIM) VALUES ('In magni quas.', 'Quo labore.', TO_DATE('2021-10-28', 'YYYY-MM-DD'), NULL);
+INSERT INTO DOMINANCIA (PLANETA, NACAO, DATA_INI, DATA_FIM) VALUES ('Quia eum.', 'Quo labore.', TO_DATE('2021-10-28', 'YYYY-MM-DD'), TO_DATE('2024-05-18', 'YYYY-MM-DD'));
+
+
+SELECT NOME, QTD_PLANETAS FROM NACAO WHERE NOME = 'Quo labore.';
+--Quo labore.	2
+
+-- Trocando a primeira dominancia inserida
+UPDATE DOMINANCIA SET NACAO = 'Iure ex rem.' WHERE NACAO = 'Quo labore.' AND PLANETA = 'Quae possimus.';
+
+
+SELECT NOME, QTD_PLANETAS FROM NACAO WHERE NOME IN ('Iure ex rem.', 'Quo labore.');
+/*
+Iure ex rem.	1
+Quo labore.	    1
+*/
+
+-- Deletando dados de dominancia
+DELETE FROM DOMINANCIA;
+
+-- Buscando novamente as nacoes
+SELECT NOME, QTD_PLANETAS FROM NACAO WHERE NOME IN ('Iure ex rem.', 'Quo labore.');
+/*
+Iure ex rem.	0
+Quo labore.	    0
+*/
+
+
+
+-- QUESTÃO 2 --------------------------------------------------------------------------------------
 
 
 
