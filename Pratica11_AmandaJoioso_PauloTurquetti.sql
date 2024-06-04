@@ -294,6 +294,59 @@ não foi concretizada, ou seja, sofreu ROLLBACK
 */
 
 
+-- QUESTÃO 3 -------------------------------------------------------------------------------
+
+/*
+
+Analisando o documento do projeto, poderemos implementar por meio de transações as funcionalidades
+do usuário do tipo COMANDANTE
+
+3. Comandante:
+    a. Pode alterar aspectos da própria nação:
+    i. Incluir/excluir a própria nação de uma federação existente
+    ii. Criar nova federação, com a própria nação
+    b. Insere nova dominância de um planeta que não está sendo dominado por ninguém
+
+
+
+a) Quais	 operações	 estão	 incluídas	 na	 transação (incluindo	 operações	 em	 triggers)?	Justifique.	
+
+Desntre as operações incluidas nessa transação, podemos ditar as seguintes operações nas tabelas envolvidas:
+- Inserções: Criação da nova federação, criação da nova dominancia
+- Updates: Alterar aspectos das proprias nacoes
+- Remoções: Excluir a nação de uma federação existente
+- Consultas: Pesquisar aspectos relativos às suas nações e federações
+
+teremos que aplicar triggers para garantir que os dados que estão sendo manipulados são referentes
+às nações e federações referentes ao comandante
+
+
+b) Qual	o	nível	de	isolamento	da	transção?	Justifique.	
+
+Essa transação terá o nível de transação READ COMMITED. Com ela, a operação irá enxergar
+apeas os dados que foram efetivados antes do início da operação. Com isso, podemos garantir maior
+consistência de dados. A opção SERIALIZABLE não é recomendada pois pode impactar a visualização das
+consultas a serem realizadas. A opção READ ONLY terá maior inconsistência. Já que no READ ONLY os dados vistos
+são apenas os efetivados antes do inicio da operação, caso outras operações sejam executadas durante a operaçõa,
+eles não serão levados em conta, podendo gerar inconsistências
+
+
+c) Será	necessário	utilizar	savepoints	e/ou	transações	autônomas?	Justifique.		
+
+O uso de savepoits pode ser utilizado quando vamos criar nova federação, com a própria nação. Como serão necessários 
+inserções em duas tabelas diferentes, podemos salvar o nosso progresso após a inserção na primeira.
+Com isso, mesmo que situações inusitadas aconteçam, teremos concretizado parte do processo.
+
+Poderemos dividir nossa transação em duas transações autônomas, sendo uma para a letra
+'a' (Alterar aspectos da própria nação) e uma para a letra 'b' (Inserção de dominancia em planetas não dominados)
+Ao usar transações autônomas para essas operações, garantimos que elas sejam tratadas de forma independente e segura, 
+preservando a integridade dos dados e mantendo a consistência do sistema.
+
+*/
+
+
+
+
 
 
 
