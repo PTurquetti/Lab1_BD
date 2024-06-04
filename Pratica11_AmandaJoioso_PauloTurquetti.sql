@@ -65,6 +65,147 @@ LOG_ID      USUARIO      OPERACAO      DATA_OPERACAO                        ESTR
 
 
 
+-- b) PARA FAZERMOS TESTES, AS OPERAÇÕES SERÃO REALIZADAS EM BLOCOS PL/SQL
+
+-- TESTANDO OPERACAO COM COMMIT
+BEGIN
+    INSERT INTO SISTEMA (ESTRELA, NOME) VALUES ('GJ 1234', 'SISTEMA 3');
+
+    COMMIT;
+
+    DECLARE
+        CURSOR C_LOG IS
+            SELECT * FROM DML_LOG;
+        V_RESULTADO DML_LOG%ROWTYPE;
+    BEGIN
+        OPEN C_LOG;
+        
+        LOOP
+            FETCH C_LOG INTO V_RESULTADO;
+            EXIT WHEN C_LOG%NOTFOUND;
+            DBMS_OUTPUT.PUT_LINE('LOG_ID: ' || V_RESULTADO.LOG_ID || 
+                                 ', USUARIO: ' || V_RESULTADO.USUARIO || 
+                                 ', OPERACAO: ' || V_RESULTADO.OPERACAO || 
+                                 ', DATA_OPERACAO: ' || V_RESULTADO.DATA_OPERACAO || 
+                                 ', ESTRELA: ' || V_RESULTADO.ESTRELA || 
+                                 ', SISTEMA: ' || V_RESULTADO.SISTEMA);
+        END LOOP;
+        
+        -- Fecha o cursor
+        CLOSE C_LOG;
+    END;
+END;
+
+
+/* SAIDA DBMS
+
+LOG_ID: 17, USUARIO: A13750791, OPERACAO: INSERT, DATA_OPERACAO: 04/06/24 17:32:23,283000, ESTRELA: GJ 1234, SISTEMA: SISTEMA 3
+
+*/
+
+
+-- TESTANDO OPERACAO COM ROLLBACK
+BEGIN
+    INSERT INTO SISTEMA (ESTRELA, NOME) VALUES ('5Ups Boo', 'SISTEMA 55');
+    ROLLBACK;
+
+    DECLARE
+        CURSOR C_LOG IS
+            SELECT * FROM DML_LOG;
+        V_RESULTADO DML_LOG%ROWTYPE;
+    BEGIN
+
+        OPEN C_LOG;
+        
+        
+        LOOP
+            FETCH C_LOG INTO V_RESULTADO;
+            EXIT WHEN C_LOG%NOTFOUND;
+            
+            DBMS_OUTPUT.PUT_LINE('LOG_ID: ' || V_RESULTADO.LOG_ID || 
+                                 ', USUARIO: ' || V_RESULTADO.USUARIO || 
+                                 ', OPERACAO: ' || V_RESULTADO.OPERACAO || 
+                                 ', DATA_OPERACAO: ' || V_RESULTADO.DATA_OPERACAO || 
+                                 ', ESTRELA: ' || V_RESULTADO.ESTRELA || 
+                                 ', SISTEMA: ' || V_RESULTADO.SISTEMA);
+        END LOOP;
+        
+        CLOSE C_LOG;
+    END;
+END;
+
+/* SAIDA DBMS
+
+OBS: Continua a mesma, ou seja, a inserção não foi realizada
+LOG_ID: 17, USUARIO: A13750791, OPERACAO: INSERT, DATA_OPERACAO: 04/06/24 17:32:23,283000, ESTRELA: GJ 1234, SISTEMA: SISTEMA 3
+
+*/
+
+-- TESTANDO OPERACAO COM  COMMIT E ROLLBACK NO MESMO BLOCO PL/SQL
+
+-- LIMPANDO TABELA SISTEMA E DML_LOG
+DELETE FROM SISTEMA;
+DELETE FROM DML_LOG;
+
+-- BLOCO PL/SQL
+BEGIN
+    -- INSERT COM COMMIT
+    INSERT INTO SISTEMA (ESTRELA, NOME) VALUES ('5Ups Boo', 'SISTEMA 3');
+    COMMIT;
+    
+    -- UPDATE COM ROLLBACK
+    UPDATE SISTEMA SET NOME = 'SISTEMA 3A' WHERE ESTRELA = '5Ups Boo';
+    ROLLBACK;
+    
+    -- DELETE COM COMMIT
+    DELETE FROM SISTEMA WHERE ESTRELA = '5Ups Boo';
+    COMMIT;
+
+
+    DECLARE
+        CURSOR C_LOG IS
+            SELECT * FROM DML_LOG;
+        V_RESULTADO DML_LOG%ROWTYPE;
+    BEGIN
+
+        OPEN C_LOG;
+        
+        
+        LOOP
+            FETCH C_LOG INTO V_RESULTADO;
+            EXIT WHEN C_LOG%NOTFOUND;
+            
+            DBMS_OUTPUT.PUT_LINE('LOG_ID: ' || V_RESULTADO.LOG_ID || 
+                                 ', USUARIO: ' || V_RESULTADO.USUARIO || 
+                                 ', OPERACAO: ' || V_RESULTADO.OPERACAO || 
+                                 ', DATA_OPERACAO: ' || V_RESULTADO.DATA_OPERACAO || 
+                                 ', ESTRELA: ' || V_RESULTADO.ESTRELA || 
+                                 ', SISTEMA: ' || V_RESULTADO.SISTEMA);
+        END LOOP;
+        
+        CLOSE C_LOG;
+    END;
+END;
+
+/* SAIDA DBMS
+LOG_ID: 25, USUARIO: A13750791, OPERACAO: INSERT, DATA_OPERACAO: 04/06/24 17:44:20,684000, ESTRELA: 5Ups Boo, SISTEMA: SISTEMA 3
+LOG_ID: 27, USUARIO: A13750791, OPERACAO: DELETE, DATA_OPERACAO: 04/06/24 17:44:20,684000, ESTRELA: 5Ups Boo, SISTEMA: SISTEMA 3
+
+
+
+ -- ANALISANDO RESULTADOS --
+
+
+No bloco PL/SQL fornecido, são realizadas operações INSERT, UPDATE E DELETE na tabela SISTEMA.
+Cada operação é acompanhada de um COMMIT ou ROLLBACK, dependendo do resultado esperado.
+
+Ao analisar a saída do DBMS, percebemos que apenas as operações de INSERT e DELETE são registradas na tabela DML_LOG,
+refletindo as mudanças permanentes na tabela SISTEMA. Isso porque essas operações foram seguidas de COMMIT.
+
+Já o UPDATE não é registrado no log porque foi desfeito pelo ROLLBACK, que restaurou o estado do banco ao último COMMIT realizado,
+ou seja, o banco voltou ao estado que tava quando foi executado o COMMIT após o INSERT.
+
+*/
 
 
 
