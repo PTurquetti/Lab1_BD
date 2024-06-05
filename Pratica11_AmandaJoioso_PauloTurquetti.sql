@@ -6,6 +6,111 @@ Paulo Henrique Vedovatto Turquetti - 13750791
 */
 
 -- QUESTÃO 1 -------------------------------------------------------------------------------
+-- Utilizando READ COMMITED
+
+-- i - Sessão 1 ligada
+-- ii. sessão 2 ligada
+-- iii. iniciando transação na sessão 2
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+-- iv. Sessão 2 - busca usando junção
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+At molestiae.	7Zet1CrB	Iste impedit fugiat optio.
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+In magni quas.	7Zet1CrB	Error repellat quisquam molestias.
+Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
+Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
+Quae possimus.	7Zet1CrB	In perspiciatis soluta.
+WD 1856+534 b	7Zet1CrB	Confirmed
+*/
+
+-- v. Sessão 1 - executa comando DML que afeta resultado
+DELETE FROM ORBITA_PLANETA WHERE ESTRELA = '7Zet1CrB';
+
+-- vi. Sessão 2 - executando novamente a busca
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+At molestiae.	7Zet1CrB	Iste impedit fugiat optio.
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+In magni quas.	7Zet1CrB	Error repellat quisquam molestias.
+Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
+Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
+Quae possimus.	7Zet1CrB	In perspiciatis soluta.
+WD 1856+534 b	7Zet1CrB	Confirmed
+
+
+Explicacao: 
+    
+*/
+
+
+-- vii. Sessão 1 - fazendo commit
+COMMIT;
+
+-- viii. Sessão 2 - Fazendo busca novamente
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+
+Explicação:
+
+
+
+*/
+
+-- ix. Sessão 2 - Fazendo COMMIT
+COMMIT;
+
+
+-- X. Sessão 2 - Fazendo busca novamente
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+
+Explicação:
+
+
+
+*/
+
+
+
+
 
 
 
