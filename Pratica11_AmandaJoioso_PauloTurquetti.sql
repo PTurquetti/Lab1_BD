@@ -130,9 +130,99 @@ INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUE
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('At molestiae.', '7Zet1CrB', 4.7, 4.8, 780);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('Modi sit harum.', '7Zet1CrB', 5.1, 5.3, 220);
 INSERT INTO ORBITA_PLANETA (PLANETA, ESTRELA, DIST_MIN, DIST_MAX, PERIODO) VALUES ('WD 1856+534 b', '7Zet1CrB', 5.1, 5.3, 220);
+COMMIT;
+
+-- i - Sessão 1 ligada
+-- ii. sessão 2 ligada
+-- iii. iniciando transação na sessão 2
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- iv. Sessão 2 - Fazendo busca
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+At molestiae.	7Zet1CrB	Iste impedit fugiat optio.
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+In magni quas.	7Zet1CrB	Error repellat quisquam molestias.
+Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
+Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
+Quae possimus.	7Zet1CrB	In perspiciatis soluta.
+WD 1856+534 b	7Zet1CrB	Confirmed
+*/
+
+-- v. Sessão 1 - executando DML que  afeta consulta:
+DELETE FROM ORBITA_PLANETA WHERE ESTRELA = '7Zet1CrB';
+
+-- vi. Sessão 2 - Executando consulta novamente
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+At molestiae.	7Zet1CrB	Iste impedit fugiat optio.
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+In magni quas.	7Zet1CrB	Error repellat quisquam molestias.
+Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
+Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
+Quae possimus.	7Zet1CrB	In perspiciatis soluta.
+WD 1856+534 b	7Zet1CrB	Confirmed
+*/
 
 
+-- vii. Sessão 1 - fazendo commit:
+COMMIT;
 
+-- viii. Sessão 2 - Executando consulta novamente
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+At molestiae.	7Zet1CrB	Iste impedit fugiat optio.
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+In magni quas.	7Zet1CrB	Error repellat quisquam molestias.
+Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
+Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
+Quae possimus.	7Zet1CrB	In perspiciatis soluta.
+WD 1856+534 b	7Zet1CrB	Confirmed
+*/
+
+
+-- ix. Sessão 2 - Fazendo COMMIT
+COMMIT;
+
+
+-- X. Sessão 2 - Fazendo busca novamente
+SELECT 
+    P.ID_ASTRO AS PLANETA,
+    OP.ESTRELA AS ESTRELA_ORBITADA,
+    P.CLASSIFICACAO
+FROM PLANETA P JOIN ORBITA_PLANETA OP ON P.ID_ASTRO = OP.PLANETA;
+/* RESULTADO DA BUSCA
+PLANETA     ESTRELA_ORBITADA     CLASSIFICACAO
+Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
+Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
+Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
+Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+
+*/
 
 
 -- QUESTÃO 2 -------------------------------------------------------------------------------
