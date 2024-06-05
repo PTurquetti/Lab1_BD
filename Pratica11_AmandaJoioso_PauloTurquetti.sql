@@ -70,7 +70,9 @@ Quae possimus.	7Zet1CrB	In perspiciatis soluta.
 WD 1856+534 b	7Zet1CrB	Confirmed
 
 
-Explicacao: 
+Explicacao: Podemos perceber que o resultado da busca se manteve o mesmo, representando um caso de inconsistência.
+Isso ocorre porque, como o commit não foi realizado na sessão 1, a remoção dos dados não foi concretizada na transação da
+sessão 2, já que READ COMMITED faz com que os dados "enxergados" sejam apenas os commitados
     
 */
 
@@ -94,6 +96,8 @@ Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
 
 Explicação:
 
+Agora podemos perceber que os dados removidos na sessão 1 também foram removidos na sessão 2. Isso porque, como a sessão 1 fez o 
+commit, a transação da sessão 2 com READ COMMIT conseguirá enxergar os dados que foram alterados (no caso removidos)
 
 
 */
@@ -118,7 +122,9 @@ Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
 
 Explicação:
 
-
+Quando sessão 2 faz COMMIT, a transação está sendo encerrada. Sendo assim, essa busca representa o estado das tabelas fora
+de uma transição. Logo, os dados serão compatíveis com o último COMMIT que realizou alterações, ou seja, é consistente com 
+as alterações feitas em sessão 1
 
 */
 
@@ -178,6 +184,13 @@ Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
 Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
 Quae possimus.	7Zet1CrB	In perspiciatis soluta.
 WD 1856+534 b	7Zet1CrB	Confirmed
+
+EXPLICAÇÃO:
+
+Do mesmo modo que ocorreu anteriormente, como as alterações feitas na sessão 1 não sofreram commit, elas não terão nenhum impacto
+sobre os dados dessa transação, independente do isolation level.
+
+
 */
 
 
@@ -202,6 +215,14 @@ Modi sit harum.	7Zet1CrB	Hic perferendis ut fuga. Perferendis culpa esse.
 Nihil deserunt.	7Zet1CrB	Iste reprehenderit ratione qui.
 Quae possimus.	7Zet1CrB	In perspiciatis soluta.
 WD 1856+534 b	7Zet1CrB	Confirmed
+
+EXPLICAÇÃO:
+
+Vemos agora um comportamento diferente devido ao tipo de isolamento da transação. Como essa transação é do tipo SERIALIZABLE,
+ela leva em consideração o ultimo estado dos dados antes do inicio da transação. Sendo assim, como o commit na sessão 1 ocorreu enquanto
+a transação já estava ativa, as operações na transação de sessão 2 não irão enxergar as remoções realizadas, configurando um caso de inconsistência
+
+
 */
 
 
@@ -221,6 +242,12 @@ Autem beatae.	21    Mon	Culpa quasi omnis temporibus.
 Autem beatae.	GJ 3579	Culpa quasi omnis temporibus.
 Deserunt aut.	Zet2Mus	Corporis rerum eius. Velit ratione et quisquam.
 Eum iure animi.	Gl 539	Odit beatae illo earum quod ipsam accusamus.
+
+EXPLICAÇÃO:
+
+Quando fazemos COMMIT em sessão 2, temos o término da transação. Sendo assim, a cláusula SERIALIZABLE deixará de fazer efeito.
+Com isso, agora o estado do sistema acessado na sessão 2 leva em conta o último commit realizado, ou seja, o commit feito na sessão 1.
+Em decorrência disso, agora percebemos a remoção dos dados
 
 */
 
@@ -559,12 +586,5 @@ Ao usar transações autônomas para essas operações, garantimos que elas seja
 preservando a integridade dos dados e mantendo a consistência do sistema.
 
 */
-
-
-
-
-
-
-
 
 
